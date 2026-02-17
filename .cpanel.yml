@@ -1,0 +1,25 @@
+---
+deployment:
+  tasks:
+    # Define paths
+    - export REPO_DIR=/home/hcvvravc/repositories/uddan-admin-frontend
+    - export APP_DIR=/home/hcvvravc/backendui
+
+    # Copy repo files to Node app folder (including hidden files)
+    - cp -r $REPO_DIR/. $APP_DIR/
+
+    # Remove git folder from app directory
+    - rm -rf $APP_DIR/.git
+
+    # Go to app directory
+    - cd $APP_DIR
+
+    # Install dependencies
+    # - npm install
+
+    # Build app (only if your project has a build script)
+    # - npm run build
+
+    # Restart Node.js app (Passenger)
+    - mkdir -p $APP_DIR/tmp
+    - touch $APP_DIR/tmp/restart.txt
