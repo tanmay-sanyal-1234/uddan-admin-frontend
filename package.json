@@ -20,7 +20,6 @@
     "dotenv": "^17.2.3",
     "jquery": "^3.7.1",
     "moment": "^2.30.1",
-    "owl.carousel": "^2.3.4",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
     "react-bootstrap-icons": "^1.11.6",
@@ -29,12 +28,9 @@
     "react-loader-spinner": "^8.0.2",
     "react-loading-skeleton": "^3.5.0",
     "react-owl-carousel": "^2.3.3",
-    "react-query": "^3.39.3",
     "react-router-dom": "^7.10.1",
     "react-select": "^5.10.2",
-    "react-slick": "^0.31.0",
     "react-toastify": "^11.0.5",
-    "slick-carousel": "^1.8.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
