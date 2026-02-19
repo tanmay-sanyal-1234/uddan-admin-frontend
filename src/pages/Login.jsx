@@ -93,11 +93,11 @@ function Login({ onLogin }) {
           </button>
         </form>
 
-        <div className="login-footer">
+        {/* <div className="login-footer">
           <p>Demo Credentials:</p>
           <p><strong>Email:</strong> admin@example.com</p>
           <p><strong>Password:</strong> admin123</p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
