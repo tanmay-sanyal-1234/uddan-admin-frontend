@@ -83,10 +83,10 @@ function Leads() {
             name: 'City',
             selector: row => row?.cityD?.name || "N/A",
         },
-        {
-            name: 'State',
-            selector: row => row?.stateD?.name || "N/A",
-        },
+        // {
+        //     name: 'State',
+        //     selector: row => row?.stateD?.name || "N/A",
+        // },
         {
             name: 'createdAt',
             selector: row => momemnt(row.createdAt).format("DD-MM-YYYY"),
