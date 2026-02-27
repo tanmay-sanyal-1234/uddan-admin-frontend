@@ -2,10 +2,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Button } from "react-bootstrap";
 import Select from 'react-select';
-import { useGetCityState, useGetStreamAndCourse, useAddCollegeCourse, useGetCollegeCourses } from "@/hooks/collegeHook";
+import { useGetCityState, useGetStreamAndCourse, useAddCollegeCourse, useGetCollegeCourses ,useCollegeCourseDelete} from "@/hooks/collegeHook";
 import { z } from "zod";
 import { toast } from 'react-toastify';
 import FullPageLoader from "@/components/FullPageLoader";
+import {ConfirmDeleteToast} from '@/components/ConfirmDeleteToast'
 function EditCollegeCourse() {
     const { collegeId } = useParams();
     const MAX_LOGO_SIZE = 2 * 1024 * 1024; // 2MB
@@ -18,7 +19,15 @@ function EditCollegeCourse() {
         fees: "",
         eligibility: "",
     };
+    const emptyRowPre = {
+        stream: null,
+        course: null,
+        fees: "",
+        eligibility: "",
+        id:""
+    };
     const [rows, setRows] = useState([emptyRow]);
+    const [preRows, setPreRows] = useState([emptyRowPre]);
     const [anyErrors, setAnyErrors] = useState(false);
     const courseRowSchema = z.object({
         streamId: z.string().min(1, "Stream is required"),
@@ -33,7 +42,7 @@ function EditCollegeCourse() {
     const { data: streamAndCourseData, isFetching: isStreamAndCourseFetching } = useGetStreamAndCourse();
     const { data: getCourse, isFetching: isGetCourseFetching } = useGetCollegeCourses(collegeId);
     const { mutateAsync: useAddCollegeCourseAdd, isPending } = useAddCollegeCourse(collegeId);
-
+    const { mutateAsync: useCollegeCourseDeleteUpdate, isPendingDeleteCourse } = useCollegeCourseDelete();
 
 
 
@@ -66,14 +75,29 @@ function EditCollegeCourse() {
                     course: course ? { value: course._id, label: course.name } : null,
                     fees: item.fees || "",
                     eligibility: item.eligibility || "",
+                    id:item?._id
                 };
             });
-            setRows(prefillData.length > 0 ? prefillData : [emptyRow]);
+            setPreRows(prefillData.length > 0 ? prefillData : [emptyRow]);
         }
     }, [getCourse, isGetCourseFetching])
 
 
-
+    const handelDelete = async(id) => {
+        setLoading(true);
+                await useCollegeCourseDeleteUpdate({id:collegeId,courseIds:[id]}, {
+                    onSuccess: (data) => {
+                        setLoading(false);
+                        console.log(data, "success")
+                        toast.success("College Course deleted successfully");
+                    },
+                    onError: (error) => {
+                        setLoading(false);
+                            toast.error("Failed to delete");
+                        console.log(error, "error")
+                    }
+                })
+    }
 
 
 
@@ -139,6 +163,10 @@ function EditCollegeCourse() {
     const handleRemoveRow = (index) => {
         setRows(rows.filter((_, i) => i !== index));
     };
+
+    const handleRemovePreRow = (index,id) => {
+        setPreRows(rows.filter((_, i) => i !== index));
+    };
     const updateRow = (index, key, value) => {
         const updated = [...rows];
         updated[index][key] = value;
@@ -161,9 +189,81 @@ function EditCollegeCourse() {
             </div>
 
             <div className="content-card">
-                {loading && isGetCourseFetching && <FullPageLoader />}
+                {(loading || isGetCourseFetching) && <FullPageLoader />}
                 <h2>College Course Information</h2>
                 <Form onSubmit={handleSubmit}>
+                    {preRows.map((row, index) => (
+                        <div key={index} className="border p-3 mb-3 rounded">
+                            <div className="row g-3 align-items-end">
+
+                                <div className="col-md-3">
+                                    <Form.Label>Stream <span className='text-danger'>*</span></Form.Label>
+                                    <Select
+                                        value={row.stream}
+                                        isLoading={isStreamAndCourseFetching}
+                                        options={streamOption()}
+                                        onChange={(val) => updateRow(index, "stream", val)}
+                                        placeholder="Select Stream"
+                                        isDisabled
+                                    />
+                                   
+                                </div>
+
+                                <div className="col-md-3">
+                                    <Form.Label>Course <span className='text-danger'>*</span></Form.Label>
+                                    <Select
+                                        value={row.course}
+                                        options={courseOption(row.stream)}
+                                        onChange={(val) => updateRow(index, "course", val)}
+                                        placeholder="Select Course"
+                                        isDisabled
+                                    />
+                                    
+                                </div>
+
+                                <div className="col-md-2">
+                                    <Form.Label>Eligibility <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Control
+                                        value={row.eligibility}
+                                        onChange={(e) =>
+                                            updateRow(index, "eligibility", e.target.value)
+                                        }
+                                        placeholder="12+"
+                                        disabled
+                                    />
+                                    
+                                </div>
+
+                                <div className="col-md-2">
+                                    <Form.Label>Fees <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Control
+                                        value={row.fees}
+                                        onChange={(e) =>
+                                            updateRow(index, "fees", e.target.value)
+                                        }
+                                        placeholder="100000"
+                                        disabled
+                                    />
+                                   
+                                </div>
+                                {console.log(row,"rowrowrow")}
+                                <div className="col-md-2 d-flex gap-2">
+                                    {preRows.length > 1 && (
+                                        <Button
+                                            variant="danger"
+                                            onClick={() =>
+                                                ConfirmDeleteToast(() => handelDelete(row.id))
+                                            }
+                                        >
+                                            🗑
+                                        </Button>
+                                    )}
+                                </div>
+
+                            </div>
+                        </div>
+                    ))}
+
                     {rows.map((row, index) => (
                         <div key={index} className="border p-3 mb-3 rounded">
                             <div className="row g-3 align-items-end">
