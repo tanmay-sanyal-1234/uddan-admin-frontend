@@ -232,7 +232,8 @@ function EditCollegeTab() {
             </div>
 
             <div className="content-card">
-                {loading && isCollegeTabDataFetching && <FullPageLoader />}
+                {console.log(loading,"loading")}
+                {(loading || isCollegeTabDataFetching) && <FullPageLoader />}
                 <h2>College Content Information</h2>
                 {rows.map((row, index) => (
                     <div key={row.id} className="border rounded p-3 mb-3">

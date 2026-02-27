@@ -303,3 +303,23 @@ export const useDashboardCount = () => {
     cacheTime: 30 * 60 * 1000 // 30 minutes
   }); 
 };
+export const useCollegeCourseDelete = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: ["useCollegeCourseDeleteUpdate"],
+        mutationFn: async ({id,courseIds}) => {
+          console.log(courseIds,"formData")
+            const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/college/course/remove/${id}`,{
+              data:courseIds
+            });
+            return res;
+        },
+        onSuccess: async (data, variables) => {
+            await queryClient.invalidateQueries({
+                queryKey: ["useGetCollegeCourses",variables?.id],
+            });
+
+        },
+    });
+
+}
