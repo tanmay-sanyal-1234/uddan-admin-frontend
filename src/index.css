@@ -496,3 +496,35 @@ tbody tr:hover {
     grid-template-columns: 1fr;
   }
 }
+
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #ddd;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.tag-input {
+  border: none !important;
+  flex: 1;
+  min-width: 150px;
+}
+
+.tag-input:focus {
+  box-shadow: none !important;
+}
+
+.tag-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.tag-close {
+  cursor: pointer;
+  font-weight: bold;
+}

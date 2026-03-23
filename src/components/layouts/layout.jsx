@@ -51,6 +51,14 @@ function Layout({ onLogout }) {
                  Leads
               </Link>
             </li>
+            <li>
+              <Link to="/add-blog" className={isActive('/add-blog')}>
+              <span className="icon">
+                <i className="fa fa-newspaper-o"></i>
+                </span>
+                 Add Blog
+              </Link>
+            </li>
             {/* <li>
               <Link to="/profile" className={isActive('/profile')}>
                 <span className="icon">👤</span>
