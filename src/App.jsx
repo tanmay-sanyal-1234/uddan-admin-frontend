@@ -15,6 +15,7 @@ import Leads from './pages/Leads';
 import EditCollege from './pages/EditCollege';
 import EditCollegeCourse from './pages/EditCollegeCourse'
 import EditCollegeTab from './pages/EditCollegeTab';
+import AddBlog from './pages/AddBlog';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -74,6 +75,7 @@ function App() {
           <Route path="college-course-edit/:collegeId" element={<EditCollegeCourse />} />
           <Route path="college-tab-edit/:collegeId" element={<EditCollegeTab />} />
           <Route path="college-info-edit/:id" element={<EditCollege />} />
+          <Route path="add-blog" element={<AddBlog />} />
         </Route>
 
       </Routes>
