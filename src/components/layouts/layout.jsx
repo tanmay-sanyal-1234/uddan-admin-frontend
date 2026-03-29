@@ -52,11 +52,27 @@ function Layout({ onLogout }) {
               </Link>
             </li>
             <li>
-              <Link to="/add-blog" className={isActive('/add-blog')}>
+              <Link to="/blogs" className={isActive('/blogs')}>
               <span className="icon">
                 <i className="fa fa-newspaper-o"></i>
                 </span>
-                 Add Blog
+                 Blogs
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact-us-list" className={isActive('/contact-us-list')}>
+              <span className="icon">
+                <i className="fa fa-envelope"></i>
+                </span>
+                 Contact Us
+              </Link>
+            </li>
+            <li>
+              <Link to="/newsletter-list" className={isActive('/newsletter-list')}>
+              <span className="icon">
+                <i className="fa fa-newspaper-o"></i>
+                </span>
+                 News Letter
               </Link>
             </li>
             {/* <li>

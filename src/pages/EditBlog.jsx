@@ -1,241 +1,218 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Form, Button, Row, Col, Card } from "react-bootstrap";
-import Select from 'react-select';
-import { useAddBlog ,useBlogPublish} from "@/hooks/blogHook";
-import { z } from "zod";
-import { toast } from 'react-toastify';
-import FullPageLoader from "@/components/FullPageLoader";
-import TagInput from '../components/TagInputComponent';
+import React, { useState, useEffect } from "react";
+import { Form, Button, Card } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-function AddBlog() {
-    const MAX_LOGO_SIZE = 2 * 1024 * 1024; // 2MB
-    const MAX_BROCHURE_SIZE = 5 * 1024 * 1024; // 5MB
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const [tags, setTags] = useState([]);
-    const { mutateAsync: useAddBlogAdd, isPending } = useAddBlog();
-    const { mutateAsync: useBlogPublishAdd, isPending:isPendingBlogPublish } = useBlogPublish();
+import { toast } from "react-toastify";
+import { z } from "zod";
+import TagInput from '../components/TagInputComponent';
+import {
+  useGetBlogDetails,
+  useUpdateBlog,
+} from "@/hooks/blogHook";
 
-    const [formData, setFormData] = useState({
-        title: "",
-        heading: "",
-        content: "",
-        // category: "65f1a2b3c4d5e6f7a8b9c0d1",
-        excerpt: "",
-        seoTitle: "",
-        seoDescription: "",
-        authorName: "",
-        tags: [""],
-        blocks: [
-            { type: "block", title: "", content: "", order: 1,blockimage:null },
-        ],
+import FullPageLoader from "@/components/FullPageLoader";
+
+function EditBlog() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const { data, isLoading,isFetching } = useGetBlogDetails(id);
+  const { mutateAsync: updateBlog } = useUpdateBlog(id);
+    const [tags, setTags] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    title: "",
+    heading: "",
+    content: "",
+    excerpt: "",
+    seoTitle: "",
+    seoDescription: "",
+    authorName: "",
+    tags: [],
+    blocks: [],
+    coverImage: null,
+    authorImage: null,
+  });
+
+  // ✅ Prefill Data
+  useEffect(() => {
+    if (data && !isFetching) {
+        console.log("object")
+      const blog = data.data;
+        console.log(blog)
+      setFormData({
+        title: blog?.title || "",
+        heading: blog?.heading || "",
+        content: blog?.content || "",
+        excerpt: blog?.excerpt || "",
+        seoTitle: blog?.seoTitle || "",
+        seoDescription: blog?.seoDescription || "",
+        authorName: blog?.author?.name || "",
+        tags: blog?.tags || [],
+        blocks: blog?.blocks || [],
         coverImage: null,
         authorImage: null,
-    });
+      });
+    }
+  }, [data,isFetching]);
 
-    const fileSchema = z
-  .instanceof(File)
-  .refine((file) => file.size <= 5 * 1024 * 1024, "Max file size is 5MB");
-
-const blockSchema = z.object({
-  type: z.enum(["block", "image"]),
-  title: z.string().optional(),
-  content: z.string().optional(),
-  order: z.number(),
-  blockimage: z.any().optional(),
-})
-.refine(data => data.type !== "block" || (data.title && data.title.trim() !== ""), {
-  message: "Block title required",
-  path: ["title"]
-})
-.refine(data => data.type !== "block" || (data.content && data.content.trim() !== ""), {
-  message: "Block content required",
-  path: ["content"]
-})
-.refine(data => data.type !== "image" || data.blockimage, {
-  message: "Block image required",
-  path: ["blockimage"]
-});
-
-const blogSchema = z.object({
-  title: z.string().min(3, "Title required"),
-  heading: z.string().min(3, "Heading required"),
-  content: z.string().min(10, "Content required"),
-
-  excerpt: z.string().optional(),
-  seoTitle: z.string().optional(),
-  seoDescription: z.string().optional(),
-
-  authorName: z.string().min(2, "Author name required"),
-
-  coverImage: z.any().optional(),
-  authorImage: z.any().optional(),
-
-  tags: z.array(z.string()).min(1, "At least one tag required"),
-
-  blocks: z.array(blockSchema).min(1, "At least one block required"),
-});
-
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
-
-    const handleTagChange = (index, value) => {
-        const newTags = [...formData.tags];
-        newTags[index] = value;
-
-        setFormData({
-            ...formData,
-            tags: newTags,
-        });
-    };
-
-    const addTag = () => {
-        setFormData({
-            ...formData,
-            tags: [...formData.tags, ""],
-        });
-    };
-
-    const handleBlockChange = (index, field, value) => {
-  const newBlocks = [...formData.blocks];
-
-  if (field === "type") {
-    newBlocks[index] = {
-      type: value,
-      title: "",
-      content: "",
-      order: newBlocks[index].order,
-      blockimage: null
-    };
-  } else {
-    newBlocks[index][field] = value;
-  }
-
-  setFormData({
-    ...formData,
-    blocks: newBlocks,
-  });
-};
-
-    const addBlock = () => {
-        setFormData({
-            ...formData,
-            blocks: [
-                ...formData.blocks,
-                { type: "block", title: "", content: "", order: formData.blocks.length + 1 },
-            ],
-        });
-    };
-
-    const handleFile = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.files[0],
-        });
-    };
-
-const handleSubmit = async(e) => {
-  e.preventDefault();
-
-  const validationData = {
-    ...formData,
-    blocks: formData.blocks.map(b => ({
-      ...b,
-      order: Number(b.order)
-    }))
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const result = blogSchema.safeParse(validationData);
+  const handleBlockChange = (index, field, value) => {
+    const newBlocks = [...formData.blocks];
+    newBlocks[index][field] = value;
 
-  if (!result.success) {
+    setFormData({ ...formData, blocks: newBlocks });
+  };
 
-    result.error.issues.forEach(err => {
-    toast.error(err.message);
+  const addBlock = () => {
+    setFormData({
+      ...formData,
+      blocks: [
+        ...formData.blocks,
+        {
+          type: "block",
+          title: "",
+          content: "",
+          order: formData.blocks.length + 1,
+        },
+      ],
+    });
+  };
+
+  const removeBlock = (index) => {
+    const newBlocks = formData.blocks
+      .filter((_, i) => i !== index)
+      .map((b, i) => ({ ...b, order: i + 1 }));
+
+    setFormData({ ...formData, blocks: newBlocks });
+  };
+
+  const handleFile = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.files[0],
+    });
+  };
+
+  const blockSchema = z.object({
+    type: z.enum(["block", "image"]),
+    title: z.string().optional(),
+    content: z.string().optional(),
+    order: z.number(),
+    blockimage: z.any().optional(),
+  })
+  .refine(data => data.type !== "block" || (data.title && data.title.trim() !== ""), {
+    message: "Block title required",
+    path: ["title"]
+  })
+  .refine(data => data.type !== "block" || (data.content && data.content.trim() !== ""), {
+    message: "Block content required",
+    path: ["content"]
+  })
+  .refine(data => data.type !== "image" || data.blockimage, {
+    message: "Block image required",
+    path: ["blockimage"]
+  });
+  
+  const blogSchema = z.object({
+    title: z.string().min(3, "Title required"),
+    heading: z.string().min(3, "Heading required"),
+    content: z.string().min(10, "Content required"),
+  
+    excerpt: z.string().optional(),
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
+  
+    authorName: z.string().min(2, "Author name required"),
+  
+    coverImage: z.any().optional(),
+    authorImage: z.any().optional(),
+  
+    tags: z.array(z.string()).min(1, "At least one tag required"),
+  
+    blocks: z.array(blockSchema).min(1, "At least one block required"),
+  });
+
+  // ✅ Submit (UPDATE)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+     const validationData = {
+        ...formData,
+        blocks: formData.blocks.map(b => ({
+          ...b,
+          order: Number(b.order)
+        }))
+      };
+    
+      const result = blogSchema.safeParse(validationData);
+    
+      if (!result.success) {
+    
+        result.error.issues.forEach(err => {
+        toast.error(err.message);
+        });
+    
+        return;
+      }
+
+    const fd = new FormData();
+
+    fd.append("title", formData.title);
+    fd.append("heading", formData.heading);
+    fd.append("content", formData.content);
+    fd.append("excerpt", formData.excerpt);
+    fd.append("seoTitle", formData.seoTitle);
+    fd.append("seoDescription", formData.seoDescription);
+    fd.append("author[name]", formData.authorName);
+
+
+    formData.tags.forEach((tag) => {
+      fd.append("tags[]", tag);
     });
 
-    return;
-  }
+    formData.blocks.forEach((block, i) => {
+      fd.append(`blocks[${i}][type]`, block.type);
+      fd.append(`blocks[${i}][title]`, block.title);
+      fd.append(`blocks[${i}][content]`, block.content);
+      fd.append(`blocks[${i}][order]`, block.order);
 
-  // ✅ If valid → create FormData
-  const fd = new FormData();
+      if (block.blockimage) {
+        fd.append(`blocks[${i}][blockimage]`, block.blockimage);
+      }
+    });
 
-  fd.append("title", formData.title);
-  fd.append("heading", formData.heading);
-  fd.append("content", formData.content);
-//   fd.append("category", formData.category);
-  fd.append("excerpt", formData.excerpt);
-  fd.append("seoTitle", formData.title);
-  fd.append("seoDescription", formData.heading);
-  fd.append("author[name]", formData.authorName);
+    if (formData.coverImage)
+      fd.append("coverImage", formData.coverImage);
 
-  formData.tags.forEach(tag => {
-    fd.append("tags[]", tag);
-  });
+    if (formData.authorImage)
+      fd.append("authorImage", formData.authorImage);
 
-  formData.blocks.forEach((block, i) => {
-    fd.append(`blocks[${i}][type]`, block.type);
-    fd.append(`blocks[${i}][title]`, block.title);
-    fd.append(`blocks[${i}][content]`, block.content);
-    fd.append(`blocks[${i}][order]`, block.order);
+    try {
+      setLoading(true);
 
-    if (block.blockimage) {
-      fd.append(`blocks[${i}][blockimage]`, block.blockimage);
-    }
-  });
-
-  if (formData.coverImage) fd.append("coverImage", formData.coverImage);
-  if (formData.authorImage) fd.append("authorImage", formData.authorImage);
-
-  setLoading(true);
-    await useAddBlogAdd(fd, {
-
-        onSuccess: async(data) => {
-            console.log(data, "success")
-            if(data.success){
-                await useBlogPublishAdd({
-                    id:data?.data?._id
-                });
-                setLoading(false);
-                toast.success("Blog Added successfully");
-
-            }
-        },
-        onError: (error) => {
-            setLoading(false);
-            toast.error("Failed to add. Please try again.");
-            console.log(error, "error")
+      await updateBlog(fd ,
+        {
+          onSuccess: () => {
+            toast.success("Blog updated successfully");
+            navigate("/blogs");
+          },
+          onError: () => {
+            toast.error("Update failed");
+          },
         }
-    })
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-
-
-  // API CALL
-};
-
-    const removeBlock = (index) => {
-
-        const newBlocks = formData.blocks.filter((_, i) => i !== index);
-
-        // ⭐ Recalculate order (VERY IMPORTANT for CMS)
-        const updatedBlocks = newBlocks.map((b, i) => ({
-            ...b,
-            order: i + 1
-        }));
-
-        setFormData({
-            ...formData,
-            blocks: updatedBlocks
-        });
-
-    };
-
-    const editorConfig = {
+  const editorConfig = {
         toolbar: {
             items: [
                 "heading",
@@ -297,16 +274,17 @@ const handleSubmit = async(e) => {
     };
 
 
-    return (
-        <div>
-            <div className="header">
-                <h1>Add New Blog</h1>
+  if (isFetching) return <FullPageLoader />;
+
+  return (
+    <div>
+     <div className="header">
+                <h1>Edit Blog</h1>
             </div>
-
-            <div className="content-card">
-                {loading && <FullPageLoader />}
-
-                <Form onSubmit={handleSubmit}>
+    <div className="content-card">
+      {loading && <FullPageLoader />}
+        {console.log(formData,"fff")}
+      <Form onSubmit={handleSubmit}>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Title <span className="text-danger">*</span></Form.Label>
@@ -329,10 +307,7 @@ const handleSubmit = async(e) => {
                             onChange={(event, editor) => {
                                 const data = editor.getData();
 
-                                setFormData({
-                                    ...formData,
-                                    content: data,
-                                })
+                                setFormData((prev) => ({ ...prev, content: data }));
 
                             }}
                         />
@@ -344,10 +319,10 @@ const handleSubmit = async(e) => {
         </Form.Group> */}
 
                     {/* TAGS */}
-                    <h5>Tags</h5>
+                    {/* <h5>Tags</h5>
                     <TagInput tags={tags} setTags={setTags} />
 
-                    <hr />
+                    <hr /> */}
 
                     {/* BLOCKS */}
                     <h5>Blocks <span className="text-danger">*</span></h5>
@@ -434,22 +409,21 @@ const handleSubmit = async(e) => {
                     </Form.Group>
                     {/* FILES */}
                     <Form.Group className="mb-3">
-                        <Form.Label>Author Image <span className="text-danger">*</span></Form.Label>
+                        <Form.Label>Author Image</Form.Label>
                         <Form.Control type="file" name="authorImage" onChange={handleFile} />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Cover Image <span className="text-danger">*</span></Form.Label>
+                        <Form.Label>Cover Image</Form.Label>
                         <Form.Control type="file" name="coverImage" onChange={handleFile} />
                     </Form.Group>
 
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit">Update</Button>
 
                 </Form>
-
-            </div>
-        </div>
-    );
+                </div>
+    </div>
+  );
 }
 
-export default AddBlog;
+export default EditBlog;
