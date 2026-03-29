@@ -16,6 +16,10 @@ import EditCollege from './pages/EditCollege';
 import EditCollegeCourse from './pages/EditCollegeCourse'
 import EditCollegeTab from './pages/EditCollegeTab';
 import AddBlog from './pages/AddBlog';
+import EditBlog from './pages/EditBlog';
+import BlogList from './pages/BlogList';
+import ContactUsList from './pages/ContactUsList';
+import NewsLetterList from './pages/NewsLetterList';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -75,7 +79,12 @@ function App() {
           <Route path="college-course-edit/:collegeId" element={<EditCollegeCourse />} />
           <Route path="college-tab-edit/:collegeId" element={<EditCollegeTab />} />
           <Route path="college-info-edit/:id" element={<EditCollege />} />
-          <Route path="add-blog" element={<AddBlog />} />
+          <Route path="blogs/add" element={<AddBlog />} />
+          <Route path="blogs/edit/:id" element={<EditBlog />} />
+          <Route path="blogs" element={<BlogList />} />
+          <Route path="contact-us-list" element={<ContactUsList />} />
+          <Route path="newsletter-list" element={<NewsLetterList />} />
+
         </Route>
 
       </Routes>

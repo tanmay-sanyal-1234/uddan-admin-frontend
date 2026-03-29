@@ -12,3 +12,25 @@ export const useGetInQueryListAdmin = ({page, limit}) => {
     }
   }); 
 }; 
+export const useGetContactUsListAdmin = ({page, limit}) => {
+  return useQuery({
+    queryKey: ["useGetContactUsListAdmin", page, limit],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${import.meta.env.VITE_ADMIN_API}/get-contact-us-list?page=${page}&limit=${limit}`
+      );
+      return res.data;
+    }
+  }); 
+}; 
+export const useGetNewLetterListAdmin = ({page, limit}) => {
+  return useQuery({
+    queryKey: ["useGetNewLetterListAdmin", page, limit],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${import.meta.env.VITE_ADMIN_API}/get-newsletter?page=${page}&limit=${limit}`
+      );
+      return res.data;
+    }
+  }); 
+}; 
