@@ -419,7 +419,7 @@ tbody tr:hover {
 }
 
 .action-wrapper {
-    position: relative;
+    /* position: relative; */
     display: inline-block;
 }
 
@@ -473,6 +473,58 @@ tbody tr:hover {
 
 .action-item.delete {
     color: red;
+}
+
+
+
+
+/* Wrapper */
+.action-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Button */
+.action-btn {
+  background: #f1f3f5;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #e2e6ea;
+}
+
+/* Dropdown Menu */
+.action-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  min-width: 140px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  padding: 6px 0;
+  z-index: 1000;
+}
+
+/* Menu Item */
+.action-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s ease;
+}
+
+.action-item:hover {
+  background: #f5f7fa;
 }
 
 
