@@ -38,6 +38,7 @@ function EditCollege() {
         pincode: "",
         lat: "",
         long: "",
+        collegeType:null
     });
 
     const [files, setFiles] = useState({
@@ -64,8 +65,21 @@ function EditCollege() {
         logo: z.instanceof(File).optional(),
         brochure: z.instanceof(File).optional(),
         collegeImage: z.instanceof(File).optional(),
+        collegeType: z
+        .object({
+            value: z.string(),
+            label: z.string(),
+        })
+        .nullable()
+        .refine(Boolean, { message: "College type is required" }),
     });
-
+        const collegeType = [
+    {
+        value:"GOVT" , label:"Government"},{
+        value:"S_GOVT" , label:"Semi Government"},{
+        value:"PVT" , label:"Private",
+    }
+];
     // =========================
     // Pre-fill Data
     // =========================
@@ -97,6 +111,7 @@ function EditCollege() {
                 country: collegeData?.data.address.country,
                 lat: collegeData?.data.lat,
                 long: collegeData?.data.long,
+                collegeType: collegeData?.data.collegeType ? collegeType.find(ct => ct.value === collegeData?.data.collegeType) : null,
             });
         }
     }, [collegeData, cityStateData,isFetchingCityState]);
@@ -167,7 +182,7 @@ function EditCollege() {
         data.append("phone", form.phone);
         data.append("email", form.email);
         data.append("website", form.website);
-
+         data.append("collegeType", form.collegeType?.value);
         data.append("address[line1]", form.addressLine1);
         data.append("address[line2]", form.addressLine2);
         data.append("address[city]", form.city.value);
@@ -303,7 +318,19 @@ function EditCollege() {
                             />
                             {errors.city && <small className="text-danger">{errors.city}</small>}
                         </div>
-
+                        <div className="form-group">
+                            <label>College Type <span className='text-danger'>*</span></label>
+                            <Select
+                                name="collegeType"
+                                value={form.collegeType}
+                                onChange={(selected) =>
+                                    setForm({ ...form, collegeType: selected })
+                                }
+                                
+                                options={collegeType}
+                            />
+                            {errors.collegeType && <small className="text-danger">{errors.collegeType}</small>}
+                        </div>
 
                     </div>
 
