@@ -82,3 +82,129 @@ export const useUpdateBlog = (blogId) => {
     });
 
 }
+
+export const useAddTestimonial = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: ["useAddTestimonialAdd"],
+        mutationFn: async (data) => {
+
+            const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/testimonial/create`,data);
+            return res;
+        }
+        // onSuccess: async (data, variables) => {
+        //     await queryClient.invalidateQueries({
+        //         queryKey: ["getAllInvitations", "RECEIVED"],
+        //     });
+
+        // },
+    });
+
+}
+
+export const useUpdateTestimonial = (testimonialId) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: ["updateTestimonial"],
+        mutationFn: async (data) => {
+           
+            const { data: res } = await axios.put(`${import.meta.env.VITE_ADMIN_API}/testimonial/update/${testimonialId}`,data);
+            return res;
+        }
+        // onSuccess: async (data, variables) => {
+        //     await queryClient.invalidateQueries({
+        //         queryKey: ["getAllInvitations", "RECEIVED"],
+        //     });
+
+        // },
+    });
+
+}
+
+export const useGetTestimonialDetails = (id) => {
+  return useQuery({
+    queryKey: ["useGetTestimonialDetails", id],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${import.meta.env.VITE_ADMIN_API}/testimonial/${id}`
+      );
+      return res.data;
+    },
+    enabled: !!id,
+  }); 
+};
+
+export const useGetTestimonialListAdmin = ({page, limit}) => {
+  return useQuery({
+    queryKey: ["useGetTestimonialListAdminList", page, limit],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${import.meta.env.VITE_ADMIN_API}/testimonial/get?page=${page}&limit=${limit}`
+      );
+      return res.data;
+    }
+  }); 
+}; 
+
+export const useAddFAQ = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: ["useAddFAQSubmit"],
+        mutationFn: async (data) => {
+
+            const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/faq/create`,data);
+            return res;
+        }
+        // onSuccess: async (data, variables) => {
+        //     await queryClient.invalidateQueries({
+        //         queryKey: ["getAllInvitations", "RECEIVED"],
+        //     });
+
+        // },
+    });
+
+}
+
+export const useGetFAQDetails = (id) => {
+  return useQuery({
+    queryKey: ["useGetFAQDetailsData", id],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${import.meta.env.VITE_ADMIN_API}/faq/${id}`
+      );
+      return res.data;
+    },
+    enabled: !!id,
+  }); 
+};
+
+export const useUpdateFAQ = (faqId) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: ["updateFAQ"],
+        mutationFn: async (data) => {
+           
+            const { data: res } = await axios.put(`${import.meta.env.VITE_ADMIN_API}/faq/update/${faqId}`,data);
+            return res;
+        }
+        // onSuccess: async (data, variables) => {
+        //     await queryClient.invalidateQueries({
+        //         queryKey: ["getAllInvitations", "RECEIVED"],
+        //     });
+
+        // },
+    });
+
+}
+
+export const useGetFaqListAdmin = ({page, limit}) => {
+  return useQuery({
+    queryKey: ["useGetFaqListAdminList", page, limit],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${import.meta.env.VITE_ADMIN_API}/faq/get?page=${page}&limit=${limit}`
+      );
+      return res.data;
+    }
+  }); 
+}; 

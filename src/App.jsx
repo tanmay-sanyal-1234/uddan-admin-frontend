@@ -20,6 +20,12 @@ import EditBlog from './pages/EditBlog';
 import BlogList from './pages/BlogList';
 import ContactUsList from './pages/ContactUsList';
 import NewsLetterList from './pages/NewsLetterList';
+import AddTestimonials from './pages/AddTestimonials';
+import EditTestimonial from './pages/EditTestimonial';
+import TestimonialsList from './pages/TestimonialsList';
+import AddFaq from './pages/AddFaq';
+import EditFaq from './pages/EditFaq';
+import FaqList from './pages/FaqList';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -84,7 +90,12 @@ function App() {
           <Route path="blogs" element={<BlogList />} />
           <Route path="contact-us-list" element={<ContactUsList />} />
           <Route path="newsletter-list" element={<NewsLetterList />} />
-
+          <Route path="testimonials/add" element={<AddTestimonials />} />
+          <Route path="testimonials/edit/:id" element={<EditTestimonial />} />
+          <Route path="testimonials" element={<TestimonialsList />} />
+          <Route path="faqs/add" element={<AddFaq />} />
+          <Route path="faqs/edit/:id" element={<EditFaq />} />
+          <Route path="faqs" element={<FaqList />} />
         </Route>
 
       </Routes>
