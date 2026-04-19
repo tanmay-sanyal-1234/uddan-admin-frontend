@@ -75,6 +75,22 @@ function Layout({ onLogout }) {
                  News Letter
               </Link>
             </li>
+            <li>
+              <Link to="/faqs" className={isActive('/faqs')}>
+              <span className="icon">
+                <i className="fa fa-question-circle"></i>
+                </span>
+                 FAQ
+              </Link>
+            </li>
+            <li>
+              <Link to="/testimonials" className={isActive('/testimonials')}>
+              <span className="icon">
+                <i className="fa fa-newspaper-o"></i>
+                </span>
+                 Testimonials
+              </Link>
+            </li>
             {/* <li>
               <Link to="/profile" className={isActive('/profile')}>
                 <span className="icon">👤</span>
