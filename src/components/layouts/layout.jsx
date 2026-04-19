@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {logo} from "@/assets/images/index";
 
 function Layout({ onLogout }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location]);
 
   const isActive = (path) => {
     return location.pathname === path ? 'active' : '';
@@ -21,7 +26,13 @@ function Layout({ onLogout }) {
 
   return (
     <div className="admin-container">
-      <aside className="sidebar">
+      {/* Sidebar Overlay for Mobile */}
+      <div 
+        className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} 
+        onClick={() => setIsSidebarOpen(false)}
+      ></div>
+
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <img src={logo} width={200} alt="Admin Logo" className="admin-logo" />
         </div>
@@ -110,6 +121,12 @@ function Layout({ onLogout }) {
       </aside>
 
       <main className="main-content">
+        <div className="mobile-header">
+          <button className="mobile-toggle" onClick={() => setIsSidebarOpen(true)}>
+            <i className="fa fa-bars"></i>
+          </button>
+          <span className="mobile-logo-text">Admin Panel</span>
+        </div>
         <Outlet />
       </main>
     </div>
