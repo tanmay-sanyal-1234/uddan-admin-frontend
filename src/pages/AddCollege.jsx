@@ -25,6 +25,7 @@ function AddCollege() {
         long: "88.4694525",
         logo: null,
         brochure: null,
+        collegeType:null
     });
     const { data: cityStateData, isFetching } = useGetCityState();
     const { mutateAsync: useAddCollegeInfoAdd, isPending } = useAddCollegeInfo();
@@ -36,6 +37,14 @@ function AddCollege() {
         website: z.string().url("Invalid website").optional().or(z.literal("")),
         addressLine1: z.string().min(3, "Address is required"),
         addressLine2: z.string().optional(),
+        collegeType: z
+            .object({
+                value: z.string(),
+                label: z.string(),
+            })
+            .nullable()
+            .refine(Boolean, { message: "College type is required" }),
+
         state: z
             .object({
                 value: z.string(),
@@ -87,7 +96,13 @@ function AddCollege() {
                 "Brochure must be less than 5MB"
             )
     });
-
+    const collegeType = [
+    {
+        value:"GOVT" , label:"Government"},{
+        value:"S_GOVT" , label:"Semi Government"},{
+        value:"PVT" , label:"Private",
+    }
+];
     const handleChange = (e) => {
         setForm({
             ...form,
@@ -162,6 +177,7 @@ function AddCollege() {
         data.append("phone", form.phone);
         data.append("email", form.email);
         data.append("website", form.website);
+        data.append("collegeType", form.collegeType?.value);
 
         data.append("address[line1]", form.addressLine1);
         data.append("address[line2]", form.addressLine2);
@@ -308,6 +324,19 @@ function AddCollege() {
                                 options={cityOption()}
                             />
                             {errors.city && <small className="text-danger">{errors.city}</small>}
+                        </div>
+                        <div className="form-group">
+                            <label>College Type <span className='text-danger'>*</span></label>
+                            <Select
+                                name="collegeType"
+                                value={form.collegeType}
+                                onChange={(selected) =>
+                                    setForm({ ...form, collegeType: selected })
+                                }
+                                
+                                options={collegeType}
+                            />
+                            {errors.collegeType && <small className="text-danger">{errors.collegeType}</small>}
                         </div>
 
 
