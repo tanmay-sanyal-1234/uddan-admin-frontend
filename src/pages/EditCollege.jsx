@@ -80,6 +80,7 @@ function EditCollege() {
         value:"PVT" , label:"Private",
     }
 ];
+
     // =========================
     // Pre-fill Data
     // =========================
