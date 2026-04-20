@@ -7,6 +7,7 @@ import { z } from "zod";
 import { toast } from 'react-toastify';
 import FullPageLoader from "@/components/FullPageLoader";
 function AddCollege() {
+    console.log("rendering add college")
     const MAX_LOGO_SIZE = 2 * 1024 * 1024; // 2MB
     const MAX_BROCHURE_SIZE = 5 * 1024 * 1024; // 5MB
     const navigate = useNavigate();
