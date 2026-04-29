@@ -318,6 +318,16 @@ function EditBlog() {
           <Form.Control name="category" onChange={handleChange} />
         </Form.Group> */}
 
+                    <Form.Group className="mb-3">
+                        <Form.Label>SEO Title</Form.Label>
+                        <Form.Control value={formData.seoTitle} name="seoTitle" onChange={handleChange} />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>SEO Description</Form.Label>
+                        <Form.Control as="textarea" rows={3} value={formData.seoDescription} name="seoDescription" onChange={handleChange} />
+                    </Form.Group>
+
                     {/* TAGS */}
                     {/* <h5>Tags</h5>
                     <TagInput tags={tags} setTags={setTags} />

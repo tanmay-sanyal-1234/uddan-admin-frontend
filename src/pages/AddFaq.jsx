@@ -21,6 +21,7 @@ function AddFaq() {
     const [formData, setFormData] = useState({
         question: "",
         answer: "",
+        category: "",
     });
 
     
@@ -30,6 +31,7 @@ function AddFaq() {
 const blogSchema = z.object({
   question: z.string().min(1, "Question required"),
   answer: z.string().min(1, "Answer required"),
+  category: z.string().min(1, "Category required"),
 });
 
     const handleChange = (e) => {
@@ -63,6 +65,7 @@ const handleSubmit = async(e) => {
   let data = {
     answer: formData.answer,
     question: formData.question,
+    category: formData.category,
   }
   
 
@@ -103,6 +106,16 @@ const handleSubmit = async(e) => {
                 {loading && <FullPageLoader />}
 
                 <Form onSubmit={handleSubmit}>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Category <span className="text-danger">*</span></Form.Label>
+                        <Form.Select name="category" value={formData.category} onChange={handleChange}>
+                            <option value="">Select Category</option>
+                            <option value="home">Home</option>
+                            <option value="about_us">About us</option>
+                            <option value="refer_and_earn">Refer and Earn</option>
+                        </Form.Select>
+                    </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Question <span className="text-danger">*</span></Form.Label>

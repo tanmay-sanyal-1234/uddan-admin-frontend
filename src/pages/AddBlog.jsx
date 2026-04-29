@@ -170,8 +170,8 @@ const handleSubmit = async(e) => {
   fd.append("content", formData.content);
 //   fd.append("category", formData.category);
   fd.append("excerpt", formData.excerpt);
-  fd.append("seoTitle", formData.title);
-  fd.append("seoDescription", formData.heading);
+  fd.append("seoTitle", formData.seoTitle);
+  fd.append("seoDescription", formData.seoDescription);
   fd.append("author[name]", formData.authorName);
 
   formData.tags.forEach(tag => {
@@ -342,6 +342,16 @@ const handleSubmit = async(e) => {
           <Form.Label>Category</Form.Label>
           <Form.Control name="category" onChange={handleChange} />
         </Form.Group> */}
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>SEO Title</Form.Label>
+                        <Form.Control value={formData.seoTitle} name="seoTitle" onChange={handleChange} />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>SEO Description</Form.Label>
+                        <Form.Control as="textarea" rows={3} value={formData.seoDescription} name="seoDescription" onChange={handleChange} />
+                    </Form.Group>
 
                     {/* TAGS */}
                     <h5>Tags</h5>
