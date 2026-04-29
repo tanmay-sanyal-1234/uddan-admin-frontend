@@ -5,7 +5,7 @@ import FullPageLoader from "@/components/FullPageLoader";
 import { useGetFaqListAdmin } from "@/hooks/blogHook";
 import momemnt from "moment";
 import { apiImageWrapper } from '@/utils/helpers';
-import {ConfirmDeleteToast} from '../components/ConfirmDeleteToast'
+import { ConfirmDeleteToast } from '../components/ConfirmDeleteToast'
 import { toast } from 'react-toastify';
 function FaqList() {
     const navigate = useNavigate();
@@ -15,7 +15,7 @@ function FaqList() {
     const [totalPages, setTotalPages] = useState(0);
     const [totalData, setTotalData] = useState(0);
     const { data: useGetFaqListAdminList, isFetching, refetch } = useGetFaqListAdmin({ page, limit });
-    
+
 
     const clList = useMemo(() => {
         if (!isFetching && useGetFaqListAdminList) {
@@ -23,6 +23,7 @@ function FaqList() {
                 id: blog._id,
                 question: blog.question,
                 answer: blog.answer,
+                category: blog.category,
                 createdAt: blog.createdAt
             }));
         }
@@ -51,6 +52,10 @@ function FaqList() {
             wrap: true,
         },
         {
+            name: 'Category',
+            selector: row => row.category ? (row.category === 'home' ? 'Home' : row.category === 'about_us' ? 'About us' : row.category === 'refer_and_earn' ? 'Refer and Earn' : row.category) : '-',
+        },
+        {
             name: 'createdAt',
             selector: row => momemnt(row.createdAt).format("DD-MM-YYYY"),
         },
@@ -64,7 +69,7 @@ function FaqList() {
                             className="action-item"
                             onClick={() => navigate(`/faqs/edit/${row.id}`)}
                         >
-                           <i className="fa fa-edit"></i> Edit
+                            <i className="fa fa-edit"></i> Edit
                         </div>
                     </div>
                 </div>
@@ -74,7 +79,7 @@ function FaqList() {
             button: true,
         }
     ];
-    
+
 
 
     return (

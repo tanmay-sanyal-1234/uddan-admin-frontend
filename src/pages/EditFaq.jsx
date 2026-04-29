@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Form, Button, Row, Col, Card } from "react-bootstrap";
 import Select from 'react-select';
-import { useUpdateFAQ ,useGetFAQDetails} from "@/hooks/blogHook";
+import { useUpdateFAQ, useGetFAQDetails } from "@/hooks/blogHook";
 import { file, z } from "zod";
 import { toast } from 'react-toastify';
 import FullPageLoader from "@/components/FullPageLoader";
@@ -16,31 +16,34 @@ function EditFaq() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [tags, setTags] = useState([]);
-    
-    const { mutateAsync: updateFAQ, isPending:isPendingBlogPublish } = useUpdateFAQ(id);
+
+    const { mutateAsync: updateFAQ, isPending: isPendingBlogPublish } = useUpdateFAQ(id);
     const { data: useGetFAQDetailsData, isFetching } = useGetFAQDetails(id);
     const [formData, setFormData] = useState({
         question: "",
         answer: "",
+        category: "",
     });
 
     useEffect(() => {
-        if(useGetFAQDetailsData?.success && !isFetching){
+        if (useGetFAQDetailsData?.success && !isFetching) {
             const details = useGetFAQDetailsData?.data;
             setFormData({
                 question: details.question,
                 answer: details.answer,
+                category: details.category || "",
             });
         }
 
-    },[useGetFAQDetailsData,isFetching])
+    }, [useGetFAQDetailsData, isFetching])
 
 
 
-const blogSchema = z.object({
-  question: z.string().min(1, "Question required"),
-  answer: z.string().min(1, "Answer required"),
-});
+    const blogSchema = z.object({
+        question: z.string().min(1, "Question required"),
+        answer: z.string().min(1, "Answer required"),
+        category: z.string().min(1, "Category required"),
+    });
 
     const handleChange = (e) => {
         setFormData({
@@ -53,52 +56,53 @@ const blogSchema = z.object({
 
 
 
-const handleSubmit = async(e) => {
-  e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
 
 
-  const result = blogSchema.safeParse(formData);
+        const result = blogSchema.safeParse(formData);
 
-  if (!result.success) {
+        if (!result.success) {
 
-    result.error.issues.forEach(err => {
-    toast.error(err.message);
-    });
+            result.error.issues.forEach(err => {
+                toast.error(err.message);
+            });
 
-    return;
-  }
-
-  // ✅ If valid → create FormData
-  let data = {
-    answer: formData.answer,
-    question: formData.question,
-  }
-  
-
-  setLoading(true);
-    await updateFAQ(data, {
-
-        onSuccess: async(data) => {
-            console.log(data, "success")
-            if(data.success){
-                
-                setLoading(false);
-                toast.success("FAQ Updated successfully");
-
-            }
-        },
-        onError: (error) => {
-            setLoading(false);
-            toast.error("Failed to add. Please try again.");
-            console.log(error, "error")
+            return;
         }
-    })
+
+        // ✅ If valid → create FormData
+        let data = {
+            answer: formData.answer,
+            question: formData.question,
+            category: formData.category,
+        }
+
+
+        setLoading(true);
+        await updateFAQ(data, {
+
+            onSuccess: async (data) => {
+                console.log(data, "success")
+                if (data.success) {
+
+                    setLoading(false);
+                    toast.success("FAQ Updated successfully");
+
+                }
+            },
+            onError: (error) => {
+                setLoading(false);
+                toast.error("Failed to add. Please try again.");
+                console.log(error, "error")
+            }
+        })
 
 
 
-  // API CALL
-};
+        // API CALL
+    };
 
 
 
@@ -113,6 +117,16 @@ const handleSubmit = async(e) => {
                 {loading && <FullPageLoader />}
 
                 <Form onSubmit={handleSubmit}>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Category <span className="text-danger">*</span></Form.Label>
+                        <Form.Select name="category" value={formData.category} onChange={handleChange}>
+                            <option value="">Select Category</option>
+                            <option value="home">Home</option>
+                            <option value="about_us">About us</option>
+                            <option value="refer_and_earn">Refer and Earn</option>
+                        </Form.Select>
+                    </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Question <span className="text-danger">*</span></Form.Label>

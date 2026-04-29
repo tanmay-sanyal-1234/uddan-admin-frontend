@@ -5,7 +5,7 @@ import FullPageLoader from "@/components/FullPageLoader";
 import { useGetBlogListAdmin } from "@/hooks/blogHook";
 import momemnt from "moment";
 import { apiImageWrapper } from '@/utils/helpers';
-import {ConfirmDeleteToast} from '../components/ConfirmDeleteToast'
+import { ConfirmDeleteToast } from '../components/ConfirmDeleteToast'
 import { toast } from 'react-toastify';
 function BlogList() {
     const navigate = useNavigate();
@@ -15,7 +15,7 @@ function BlogList() {
     const [totalPages, setTotalPages] = useState(0);
     const [totalData, setTotalData] = useState(0);
     const { data: blogListData, isFetching, refetch } = useGetBlogListAdmin({ page, limit });
-    
+
 
     const clList = useMemo(() => {
         if (!isFetching && blogListData) {
@@ -46,9 +46,9 @@ function BlogList() {
         },
         {
             name: 'Image',
-             cell: (row) => (
+            cell: (row) => (
                 <div>
-                    <img src={apiImageWrapper(row.coverImage)} style={{width:"55%"}} alt="" srcset="" />
+                    <img src={apiImageWrapper(row.coverImage)} style={{ width: "55%" }} alt="" srcset="" />
                 </div>
             ),
         },
@@ -64,9 +64,9 @@ function BlogList() {
                     <div className="action-menu">
                         <div
                             className="action-item"
-                            onClick={() => navigate(`/blog/edit/${row.id}`)}
+                            onClick={() => navigate(`/blogs/edit/${row.id}`)}
                         >
-                           <i className="fa fa-edit"></i> Edit
+                            <i className="fa fa-edit"></i> Edit
                         </div>
                     </div>
                 </div>
