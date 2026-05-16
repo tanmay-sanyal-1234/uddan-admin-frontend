@@ -28,6 +28,7 @@ function EditFaq() {
     useEffect(() => {
         if (useGetFAQDetailsData?.success && !isFetching) {
             const details = useGetFAQDetailsData?.data;
+            console.log(details, "details")
             setFormData({
                 question: details.question,
                 answer: details.answer,
@@ -107,6 +108,65 @@ function EditFaq() {
 
 
 
+    const editorConfig = {
+        toolbar: {
+            items: [
+                "heading",
+                "|",
+                "bold",
+                "italic",
+                "underline",
+                "strikethrough",
+                "link",
+                "bulletedList",
+                "numberedList",
+                "|",
+                "outdent",
+                "indent",
+                "|",
+                "blockQuote",
+                "insertTable",
+                "mediaEmbed",
+                "horizontalLine",
+                "|",
+                "alignment",
+                "fontSize",
+                "fontColor",
+                "fontBackgroundColor",
+                "highlight",
+                "|",
+                "codeBlock",
+                "sourceEditing",
+                "|",
+                "undo",
+                "redo"
+            ],
+            shouldNotGroupWhenFull: true,
+        },
+        codeBlock: {
+            languages: [
+                { language: "plaintext", label: "Plain text" },
+                { language: "html", label: "HTML" },
+                { language: "css", label: "CSS" },
+                { language: "javascript", label: "JavaScript" },
+                { language: "json", label: "JSON" },
+            ],
+        },
+        table: {
+            contentToolbar: [
+                "tableColumn",
+                "tableRow",
+                "mergeTableCells",
+                "tableCellProperties",
+                "tableCellProperties",
+                "tableProperties",
+            ],
+        },
+        mediaEmbed: {
+            previewsInData: true,
+        },
+    };
+
     return (
         <div>
             <div className="header">
@@ -123,8 +183,8 @@ function EditFaq() {
                         <Form.Select name="category" value={formData.category} onChange={handleChange}>
                             <option value="">Select Category</option>
                             <option value="home">Home</option>
-                            <option value="about_us">About us</option>
-                            <option value="refer_and_earn">Refer and Earn</option>
+                            <option value="aboutus">About us</option>
+                            <option value="referandearn">Refer and Earn</option>
                         </Form.Select>
                     </Form.Group>
 
@@ -134,7 +194,22 @@ function EditFaq() {
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Answer <span className="text-danger">*</span></Form.Label>
-                        <Form.Control as="textarea" rows={5} value={formData.answer} name="answer" onChange={handleChange} />
+                        {!isFetching ? (
+                            <CKEditor
+                                editor={ClassicEditor}
+                                data={formData.answer}
+                                config={editorConfig}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        answer: data,
+                                    }));
+                                }}
+                            />
+                        ) : (
+                            <div className="text-muted">Loading editor...</div>
+                        )}
                     </Form.Group>
 
                     <Button type="submit">Submit</Button>

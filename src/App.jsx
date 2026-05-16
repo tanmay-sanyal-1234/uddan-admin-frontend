@@ -9,6 +9,8 @@ import AddCollege from './pages/AddCollege';
 import Profile from './pages/Profile';
 import AddCollegeCourse from './pages/AddCollegeCourse';
 import AddCollegeTab from './pages/AddCollegeTab';
+import CollegeDetails from './pages/college-details';
+
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Leads from './pages/Leads';
@@ -26,6 +28,9 @@ import TestimonialsList from './pages/TestimonialsList';
 import AddFaq from './pages/AddFaq';
 import EditFaq from './pages/EditFaq';
 import FaqList from './pages/FaqList';
+import AddAdvertiseBanner from './pages/AddAdvertiseBanner';
+import EditAdvertiseBanner from './pages/EditAdvertiseBanner';
+import AdvertismentList from './pages/AdvertismentList';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -80,6 +85,8 @@ function App() {
           <Route path="college/add" element={<AddCollege />} />
           <Route path="college/add-course/:collegeId" element={<AddCollegeCourse />} />
           <Route path="college/add-college-tab/:collegeId" element={<AddCollegeTab />} />
+          <Route path="college/editorial/:collegeId" element={<CollegeDetails />} />
+
           <Route path="profile" element={<Profile />} />
           <Route path="leads" element={<Leads />} />
           <Route path="college-course-edit/:collegeId" element={<EditCollegeCourse />} />
@@ -96,6 +103,9 @@ function App() {
           <Route path="faqs/add" element={<AddFaq />} />
           <Route path="faqs/edit/:id" element={<EditFaq />} />
           <Route path="faqs" element={<FaqList />} />
+          <Route path="advertisments/add" element={<AddAdvertiseBanner />} />
+          <Route path="advertisments/edit/:id" element={<EditAdvertiseBanner />} />
+          <Route path="advertisments" element={<AdvertismentList />} />
         </Route>
 
       </Routes>

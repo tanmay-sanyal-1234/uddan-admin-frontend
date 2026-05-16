@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import FullPageLoader from "@/components/FullPageLoader";
-import { useGetTestimonialListAdmin } from "@/hooks/blogHook";
+import { useGetTestimonialListAdmin, useTestimonialDelete } from "@/hooks/blogHook";
 import momemnt from "moment";
 import { apiImageWrapper } from '@/utils/helpers';
-import {ConfirmDeleteToast} from '../components/ConfirmDeleteToast'
+import { ConfirmDeleteToast } from '../components/ConfirmDeleteToast'
 import { toast } from 'react-toastify';
 function TestimonialsList() {
     const navigate = useNavigate();
@@ -15,7 +15,21 @@ function TestimonialsList() {
     const [totalPages, setTotalPages] = useState(0);
     const [totalData, setTotalData] = useState(0);
     const { data: useGetTestimonialListAdminList, isFetching, refetch } = useGetTestimonialListAdmin({ page, limit });
-    
+    const { mutateAsync: testimonialDeleteUpdate } = useTestimonialDelete();
+
+    const handleDelete = async (id) => {
+        setLoading(true);
+        await testimonialDeleteUpdate(id, {
+            onSuccess: (data) => {
+                setLoading(false);
+                toast.success("Testimonial deleted successfully");
+            },
+            onError: (error) => {
+                setLoading(false);
+                toast.error("Failed to delete");
+            }
+        })
+    };
 
     const clList = useMemo(() => {
         if (!isFetching && useGetTestimonialListAdminList) {
@@ -46,9 +60,9 @@ function TestimonialsList() {
         },
         {
             name: 'Image',
-             cell: (row) => (
+            cell: (row) => (
                 <div>
-                    <img src={apiImageWrapper(row.iamge)} style={{width:"55%"}} alt="" srcset="" />
+                    <img src={apiImageWrapper(row.iamge)} style={{ width: "55%" }} alt="" srcset="" />
                 </div>
             ),
         },
@@ -66,7 +80,13 @@ function TestimonialsList() {
                             className="action-item"
                             onClick={() => navigate(`/testimonials/edit/${row.id}`)}
                         >
-                           <i className="fa fa-edit"></i> Edit
+                            <i className="fa fa-edit"></i> Edit
+                        </div>
+                        <div
+                            className="action-item delete"
+                            onClick={() => ConfirmDeleteToast(() => handleDelete(row.id))}
+                        >
+                            <i className="fa fa-trash"></i> Delete
                         </div>
                     </div>
                 </div>
@@ -76,7 +96,7 @@ function TestimonialsList() {
             button: true,
         }
     ];
-    
+
 
 
     return (

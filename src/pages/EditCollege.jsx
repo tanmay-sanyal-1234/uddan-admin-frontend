@@ -38,7 +38,13 @@ function EditCollege() {
         pincode: "",
         lat: "",
         long: "",
-        collegeType:null
+        collegeType:null,
+        university: "",
+        accreditation: "",
+        est: "",
+        description: "",
+        bottomLine: "",
+        shortLine: ""
     });
 
     const [files, setFiles] = useState({
@@ -72,6 +78,12 @@ function EditCollege() {
         })
         .nullable()
         .refine(Boolean, { message: "College type is required" }),
+        university: z.string().optional(),
+        accreditation: z.string().optional(),
+        est: z.string().optional(),
+        description: z.string().optional(),
+        bottomLine: z.string().optional(),
+        shortLine: z.string().optional(),
     });
         const collegeType = [
     {
@@ -113,6 +125,12 @@ function EditCollege() {
                 lat: collegeData?.data.lat,
                 long: collegeData?.data.long,
                 collegeType: collegeData?.data.collegeType ? collegeType.find(ct => ct.value === collegeData?.data.collegeType) : null,
+                university: collegeData?.data.university || "",
+                accreditation: collegeData?.data.accreditation || "",
+                est: collegeData?.data.est || "",
+                description: collegeData?.data.description || "",
+                bottomLine: collegeData?.data.bottomLine || "",
+                shortLine: collegeData?.data.shortLine || "",
             });
         }
     }, [collegeData, cityStateData,isFetchingCityState]);
@@ -198,6 +216,13 @@ function EditCollege() {
         if (files.brochure) data.append("brochure", files.brochure);
         if (files.collegeImage)
             data.append("thumbnail", files.collegeImage);
+
+        data.append("university", form.university);
+        data.append("accreditation", form.accreditation);
+        data.append("est", form.est);
+        data.append("description", form.description);
+        data.append("bottomLine", form.bottomLine);
+        data.append("shortLine", form.shortLine);
 
         try {
             await updateCollege(data);
@@ -345,6 +370,37 @@ function EditCollege() {
                         <div className="form-group">
                             <label>Country</label>
                             <input value="India" readOnly />
+                        </div>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>University</label>
+                            <input name="university" onChange={handleChange} value={form.university} />
+                        </div>
+                        <div className="form-group">
+                            <label>Accreditation</label>
+                            <input name="accreditation" onChange={handleChange} value={form.accreditation} />
+                        </div>
+                        <div className="form-group">
+                            <label>Established Year (EST)</label>
+                            <input name="est" onChange={handleChange} value={form.est} />
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Description</label>
+                        <textarea name="description" className="form-control" onChange={handleChange} rows="3" value={form.description}></textarea>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>Short Line</label>
+                            <input name="shortLine" onChange={handleChange} value={form.shortLine} />
+                        </div>
+                        <div className="form-group">
+                            <label>Bottom Line</label>
+                            <input name="bottomLine" onChange={handleChange} value={form.bottomLine} />
                         </div>
                     </div>
 

@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Row, Col, Card } from "react-bootstrap";
 import Select from 'react-select';
-import { useAddFAQ ,useBlogPublish} from "@/hooks/blogHook";
+import { useAddFAQ, useBlogPublish } from "@/hooks/blogHook";
 import { file, z } from "zod";
 import { toast } from 'react-toastify';
 import FullPageLoader from "@/components/FullPageLoader";
@@ -15,8 +15,8 @@ function AddFaq() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [tags, setTags] = useState([]);
-    
-    const { mutateAsync: useAddFAQSubmit, isPending:isPendingBlogPublish } = useAddFAQ();
+
+    const { mutateAsync: useAddFAQSubmit, isPending: isPendingBlogPublish } = useAddFAQ();
 
     const [formData, setFormData] = useState({
         question: "",
@@ -24,15 +24,15 @@ function AddFaq() {
         category: "",
     });
 
-    
 
 
 
-const blogSchema = z.object({
-  question: z.string().min(1, "Question required"),
-  answer: z.string().min(1, "Answer required"),
-  category: z.string().min(1, "Category required"),
-});
+
+    const blogSchema = z.object({
+        question: z.string().min(1, "Question required"),
+        answer: z.string().min(1, "Answer required"),
+        category: z.string().min(1, "Category required"),
+    });
 
     const handleChange = (e) => {
         setFormData({
@@ -45,56 +45,115 @@ const blogSchema = z.object({
 
 
 
-const handleSubmit = async(e) => {
-  e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
 
 
-  const result = blogSchema.safeParse(formData);
+        const result = blogSchema.safeParse(formData);
 
-  if (!result.success) {
+        if (!result.success) {
 
-    result.error.issues.forEach(err => {
-    toast.error(err.message);
-    });
+            result.error.issues.forEach(err => {
+                toast.error(err.message);
+            });
 
-    return;
-  }
-
-  // ✅ If valid → create FormData
-  let data = {
-    answer: formData.answer,
-    question: formData.question,
-    category: formData.category,
-  }
-  
-
-  setLoading(true);
-    await useAddFAQSubmit(data, {
-
-        onSuccess: async(data) => {
-            console.log(data, "success")
-            if(data.success){
-                
-                setLoading(false);
-                toast.success("FAQ Added successfully");
-
-            }
-        },
-        onError: (error) => {
-            setLoading(false);
-            toast.error("Failed to add. Please try again.");
-            console.log(error, "error")
+            return;
         }
-    })
+
+        // ✅ If valid → create FormData
+        let data = {
+            answer: formData.answer,
+            question: formData.question,
+            category: formData.category,
+        }
+
+
+        setLoading(true);
+        await useAddFAQSubmit(data, {
+
+            onSuccess: async (data) => {
+                console.log(data, "success")
+                if (data.success) {
+
+                    setLoading(false);
+                    toast.success("FAQ Added successfully");
+
+                }
+            },
+            onError: (error) => {
+                setLoading(false);
+                toast.error("Failed to add. Please try again.");
+                console.log(error, "error")
+            }
+        })
 
 
 
-  // API CALL
-};
+        // API CALL
+    };
 
 
 
+
+    const editorConfig = {
+        toolbar: {
+            items: [
+                "heading",
+                "|",
+                "bold",
+                "italic",
+                "underline",
+                "strikethrough",
+                "link",
+                "bulletedList",
+                "numberedList",
+                "|",
+                "outdent",
+                "indent",
+                "|",
+                "blockQuote",
+                "insertTable",
+                "mediaEmbed",
+                "horizontalLine",
+                "|",
+                "alignment",
+                "fontSize",
+                "fontColor",
+                "fontBackgroundColor",
+                "highlight",
+                "|",
+                "codeBlock",
+                "sourceEditing",
+                "|",
+                "undo",
+                "redo"
+            ],
+            shouldNotGroupWhenFull: true,
+        },
+        codeBlock: {
+            languages: [
+                { language: "plaintext", label: "Plain text" },
+                { language: "html", label: "HTML" },
+                { language: "css", label: "CSS" },
+                { language: "javascript", label: "JavaScript" },
+                { language: "json", label: "JSON" },
+            ],
+        },
+        table: {
+            contentToolbar: [
+                "tableColumn",
+                "tableRow",
+                "mergeTableCells",
+                "tableCellProperties",
+                "tableCellProperties",
+                "tableProperties",
+            ],
+        },
+        mediaEmbed: {
+            previewsInData: true,
+        },
+    };
 
     return (
         <div>
@@ -112,8 +171,8 @@ const handleSubmit = async(e) => {
                         <Form.Select name="category" value={formData.category} onChange={handleChange}>
                             <option value="">Select Category</option>
                             <option value="home">Home</option>
-                            <option value="about_us">About us</option>
-                            <option value="refer_and_earn">Refer and Earn</option>
+                            <option value="aboutus">About us</option>
+                            <option value="referandearn">Refer and Earn</option>
                         </Form.Select>
                     </Form.Group>
 
@@ -123,7 +182,18 @@ const handleSubmit = async(e) => {
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Answer <span className="text-danger">*</span></Form.Label>
-                        <Form.Control as="textarea" rows={5} value={formData.answer} name="answer" onChange={handleChange} />
+                        <CKEditor
+                            editor={ClassicEditor}
+                            data={formData.answer}
+                            config={editorConfig}
+                            onChange={(event, editor) => {
+                                const data = editor.getData();
+                                setFormData(prev => ({
+                                    ...prev,
+                                    answer: data,
+                                }));
+                            }}
+                        />
                     </Form.Group>
 
                     <Button type="submit">Submit</Button>

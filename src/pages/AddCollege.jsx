@@ -26,7 +26,13 @@ function AddCollege() {
         long: "88.4694525",
         logo: null,
         brochure: null,
-        collegeType:null
+        collegeType:null,
+        university: "",
+        accreditation: "",
+        est: "",
+        description: "",
+        bottomLine: "",
+        shortLine: ""
     });
     const { data: cityStateData, isFetching } = useGetCityState();
     const { mutateAsync: useAddCollegeInfoAdd, isPending } = useAddCollegeInfo();
@@ -95,7 +101,13 @@ function AddCollege() {
             .refine(
                 (file) => file.size <= MAX_BROCHURE_SIZE,
                 "Brochure must be less than 5MB"
-            )
+            ),
+        university: z.string().optional(),
+        accreditation: z.string().optional(),
+        est: z.string().optional(),
+        description: z.string().optional(),
+        bottomLine: z.string().optional(),
+        shortLine: z.string().optional(),
     });
     const collegeType = [
     {
@@ -193,6 +205,13 @@ function AddCollege() {
         if (files.logo) data.append("logo", files.logo);
         if (files.brochure) data.append("brochure", files.brochure);
         if (files.collegeImage) data.append("thumbnail", files.collegeImage);
+
+        data.append("university", form.university);
+        data.append("accreditation", form.accreditation);
+        data.append("est", form.est);
+        data.append("description", form.description);
+        data.append("bottomLine", form.bottomLine);
+        data.append("shortLine", form.shortLine);
 
         // mutation.mutate(data);
 
@@ -353,6 +372,37 @@ function AddCollege() {
                         <div className="form-group">
                             <label>Country</label>
                             <input value="India" readOnly />
+                        </div>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>University</label>
+                            <input name="university" onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label>Accreditation</label>
+                            <input name="accreditation" onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label>Established Year (EST)</label>
+                            <input name="est" onChange={handleChange} />
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Description</label>
+                        <textarea name="description" className="form-control" onChange={handleChange} rows="3"></textarea>
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>Short Line</label>
+                            <input name="shortLine" onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label>Bottom Line</label>
+                            <input name="bottomLine" onChange={handleChange} />
                         </div>
                     </div>
 

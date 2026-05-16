@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import FullPageLoader from "@/components/FullPageLoader";
-import { useGetFaqListAdmin } from "@/hooks/blogHook";
+import { useGetFaqListAdmin, useFaqDelete } from "@/hooks/blogHook";
 import momemnt from "moment";
 import { apiImageWrapper } from '@/utils/helpers';
 import { ConfirmDeleteToast } from '../components/ConfirmDeleteToast'
@@ -15,6 +15,21 @@ function FaqList() {
     const [totalPages, setTotalPages] = useState(0);
     const [totalData, setTotalData] = useState(0);
     const { data: useGetFaqListAdminList, isFetching, refetch } = useGetFaqListAdmin({ page, limit });
+    const { mutateAsync: faqDeleteUpdate } = useFaqDelete();
+
+    const handleDelete = async (id) => {
+        setLoading(true);
+        await faqDeleteUpdate(id, {
+            onSuccess: (data) => {
+                setLoading(false);
+                toast.success("FAQ deleted successfully");
+            },
+            onError: (error) => {
+                setLoading(false);
+                toast.error("Failed to delete");
+            }
+        })
+    };
 
 
     const clList = useMemo(() => {
@@ -48,12 +63,12 @@ function FaqList() {
         },
         {
             name: 'Answer',
-            selector: row => row.answer,
+            selector: row => <div dangerouslySetInnerHTML={{ __html: row.answer }}></div>,
             wrap: true,
         },
         {
             name: 'Category',
-            selector: row => row.category ? (row.category === 'home' ? 'Home' : row.category === 'about_us' ? 'About us' : row.category === 'refer_and_earn' ? 'Refer and Earn' : row.category) : '-',
+            selector: row => row.category ? (row.category === 'home' ? 'Home' : row.category === 'aboutus' ? 'About us' : row.category === 'referandearn' ? 'Refer and Earn' : row.category) : '-',
         },
         {
             name: 'createdAt',
@@ -70,6 +85,12 @@ function FaqList() {
                             onClick={() => navigate(`/faqs/edit/${row.id}`)}
                         >
                             <i className="fa fa-edit"></i> Edit
+                        </div>
+                        <div
+                            className="action-item delete"
+                            onClick={() => ConfirmDeleteToast(() => handleDelete(row.id))}
+                        >
+                            <i className="fa fa-trash"></i> Delete
                         </div>
                     </div>
                 </div>

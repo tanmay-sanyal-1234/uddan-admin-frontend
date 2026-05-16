@@ -1,4 +1,4 @@
-import { useQuery,useMutation ,useQueryClient} from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 export const useGetCollegeList = (page = 1, limit = 10, filters = "") => {
@@ -10,10 +10,10 @@ export const useGetCollegeList = (page = 1, limit = 10, filters = "") => {
       );
       return res.data;
     }
-  }); 
+  });
 };
 
-export const useGetCollegeListHome = ({page = 1, limit = 10, courseId}) => {
+export const useGetCollegeListHome = ({ page = 1, limit = 10, courseId }) => {
   return useQuery({
     queryKey: ["useGetCollegeListHome", page, limit, courseId],
     queryFn: async () => {
@@ -25,7 +25,7 @@ export const useGetCollegeListHome = ({page = 1, limit = 10, courseId}) => {
     enabled: !!courseId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000 // 10 minutes
-  }); 
+  });
 };
 
 export const useGetCollegeDetailsById = (id) => {
@@ -38,7 +38,7 @@ export const useGetCollegeDetailsById = (id) => {
       return res.data?.data;
     },
     enabled: !!id
-  }); 
+  });
 };
 
 export const useGetStreams = () => {
@@ -50,7 +50,7 @@ export const useGetStreams = () => {
       );
       return res.data?.data;
     }
-  }); 
+  });
 };
 
 export const useGetCityState = () => {
@@ -62,7 +62,7 @@ export const useGetCityState = () => {
       );
       return res.data?.data;
     }
-  }); 
+  });
 };
 export const useGetCity = () => {
   return useQuery({
@@ -75,7 +75,7 @@ export const useGetCity = () => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 30 * 60 * 1000 // 30 minutes
-  }); 
+  });
 };
 
 export const useGetCourses = () => {
@@ -89,7 +89,7 @@ export const useGetCourses = () => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000 // 10 minutes
-  }); 
+  });
 };
 
 export const useGetStreamAndCourse = () => {
@@ -103,64 +103,64 @@ export const useGetStreamAndCourse = () => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000 // 10 minutes
-  }); 
+  });
 };
 
 export const useAddCollegeInfo = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationKey: ["useAddCollegeInfoAdd"],
-        mutationFn: async (data) => {
-            const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/college/create`,data);
-            return res;
-        }
-        // onSuccess: async (data, variables) => {
-        //     await queryClient.invalidateQueries({
-        //         queryKey: ["getAllInvitations", "RECEIVED"],
-        //     });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useAddCollegeInfoAdd"],
+    mutationFn: async (data) => {
+      const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/college/create`, data);
+      return res;
+    }
+    // onSuccess: async (data, variables) => {
+    //     await queryClient.invalidateQueries({
+    //         queryKey: ["getAllInvitations", "RECEIVED"],
+    //     });
 
-        // },
-    });
+    // },
+  });
 
 }
 export const useAddCollegeCourse = (id) => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationKey: ["useAddCollegeCourseAdd"],
-        mutationFn: async (data) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useAddCollegeCourseAdd"],
+    mutationFn: async (data) => {
 
-            const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/college/course/add/${id}`,data);
-            return res;
-        }
-        // onSuccess: async (data, variables) => {
-        //     await queryClient.invalidateQueries({
-        //         queryKey: ["getAllInvitations", "RECEIVED"],
-        //     });
+      const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/college/course/add/${id}`, data);
+      return res;
+    }
+    // onSuccess: async (data, variables) => {
+    //     await queryClient.invalidateQueries({
+    //         queryKey: ["getAllInvitations", "RECEIVED"],
+    //     });
 
-        // },
-    });
+    // },
+  });
 
 }
 
 export const useAddCollegeTab = (id) => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationKey: ["useAddCollegeTabAdd"],
-        mutationFn: async (data) => {
-          
-            const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/college/tab/add/${id}`,data);
-            return res;
-        },
-        onSuccess: async (data, variables) => {
-            await queryClient.invalidateQueries({
-                queryKey: ["useGetCollegeTab", id],
-            });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useAddCollegeTabAdd"],
+    mutationFn: async (data) => {
 
-        },
-    });
+      const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/college/tab/add/${id}`, data);
+      return res;
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["useGetCollegeTab", id],
+      });
+
+    },
+  });
 
 }
-export const useGetCollegeListAdmin = ({page, limit}) => {
+export const useGetCollegeListAdmin = ({ page, limit }) => {
   return useQuery({
     queryKey: ["useGetCollegeListAdmin", page, limit],
     queryFn: async () => {
@@ -169,10 +169,10 @@ export const useGetCollegeListAdmin = ({page, limit}) => {
       );
       return res.data;
     }
-  }); 
+  });
 };
 
-export const useGetLeadListAdmin = ({page, limit}) => {
+export const useGetLeadListAdmin = ({ page, limit }) => {
   return useQuery({
     queryKey: ["useGetLeadListAdmin", page, limit],
     queryFn: async () => {
@@ -181,23 +181,23 @@ export const useGetLeadListAdmin = ({page, limit}) => {
       );
       return res.data;
     }
-  }); 
+  });
 };
 export const useUpdateCollegeInfo = (id) => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationKey: ["useUpdateCollegeInfoUpdate"],
-        mutationFn: async (data) => {
-            const { data: res } = await axios.put(`${import.meta.env.VITE_ADMIN_API}/college/update/${id}`,data);
-            return res;
-        }
-        // onSuccess: async (data, variables) => {
-        //     await queryClient.invalidateQueries({
-        //         queryKey: ["getAllInvitations", "RECEIVED"],
-        //     });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useUpdateCollegeInfoUpdate"],
+    mutationFn: async (data) => {
+      const { data: res } = await axios.put(`${import.meta.env.VITE_ADMIN_API}/college/update/${id}`, data);
+      return res;
+    }
+    // onSuccess: async (data, variables) => {
+    //     await queryClient.invalidateQueries({
+    //         queryKey: ["getAllInvitations", "RECEIVED"],
+    //     });
 
-        // },
-    });
+    // },
+  });
 
 }
 
@@ -210,25 +210,25 @@ export const useGetCollegeById = (id) => {
       );
       return res.data;
     },
-    enabled:!!id
-  }); 
+    enabled: !!id
+  });
 };
 
 export const useLeadDelete = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationKey: ["useLeadDeleteUpdate"],
-        mutationFn: async (id) => {
-            const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/remove-lead/${id}`);
-            return res;
-        },
-        onSuccess: async (data, variables) => {
-            await queryClient.invalidateQueries({
-                queryKey: ["useGetLeadListAdmin"],
-            });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useLeadDeleteUpdate"],
+    mutationFn: async (id) => {
+      const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/remove-lead/${id}`);
+      return res;
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["useGetLeadListAdmin"],
+      });
 
-        },
-    });
+    },
+  });
 
 }
 
@@ -241,8 +241,8 @@ export const useGetCollegeCourses = (id) => {
       );
       return res.data;
     },
-    enabled:!!id
-  }); 
+    enabled: !!id
+  });
 };
 export const useGetCollegeTab = (id) => {
   return useQuery({
@@ -253,41 +253,41 @@ export const useGetCollegeTab = (id) => {
       );
       return res.data;
     },
-    enabled:!!id
-  }); 
+    enabled: !!id
+  });
 };
 export const useAddCollegeTabEdit = (id) => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationKey: ["useAddCollegeTabEditSubmit"],
-        mutationFn: async (data) => {
-            const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/college/tab/add/${id}/${data?.tabId}`,data);
-            return res;
-        },
-        onSuccess: async (data, variables) => {
-            await queryClient.invalidateQueries({
-                queryKey: ["useGetCollegeTab", id],
-            });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useAddCollegeTabEditSubmit"],
+    mutationFn: async (data) => {
+      const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/college/tab/add/${id}/${data?.tabId}`, data);
+      return res;
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["useGetCollegeTab", id],
+      });
 
-        },
-    });
+    },
+  });
 
 }
 export const useCollegeDelete = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationKey: ["useCollegeDeleteUpdate"],
-        mutationFn: async (id) => {
-            const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/remove-college/${id}`);
-            return res;
-        },
-        onSuccess: async (data, variables) => {
-            await queryClient.invalidateQueries({
-                queryKey: ["useGetCollegeListAdmin"],
-            });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useCollegeDeleteUpdate"],
+    mutationFn: async (id) => {
+      const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/remove-college/${id}`);
+      return res;
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["useGetCollegeListAdmin"],
+      });
 
-        },
-    });
+    },
+  });
 
 }
 export const useDashboardCount = () => {
@@ -301,25 +301,51 @@ export const useDashboardCount = () => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 30 * 60 * 1000 // 30 minutes
-  }); 
+  });
 };
 export const useCollegeCourseDelete = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationKey: ["useCollegeCourseDeleteUpdate"],
-        mutationFn: async ({id,courseIds}) => {
-          console.log(courseIds,"formData")
-            const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/college/course/remove/${id}`,{
-              data:courseIds
-            });
-            return res;
-        },
-        onSuccess: async (data, variables) => {
-            await queryClient.invalidateQueries({
-                queryKey: ["useGetCollegeCourses",variables?.id],
-            });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useCollegeCourseDeleteUpdate"],
+    mutationFn: async ({ id, courseIds }) => {
+      console.log(courseIds, "formData")
+      const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/college/course/remove/${id}`, {
+        data: courseIds
+      });
+      return res;
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["useGetCollegeCourses", variables?.id],
+      });
 
-        },
-    });
+    },
+  });
 
 }
+export const useAddCollegeDetails = (id) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useAddCollegeDetailsAdd"],
+    mutationFn: async (data) => {
+      const { data: res } = await axios.post(`${import.meta.env.VITE_ADMIN_API}/college/section/add/${id}`, data);
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["useGetCollegeDetails", id]);
+    }
+  });
+}
+
+export const useGetCollegeDetails = (id) => {
+  return useQuery({
+    queryKey: ["useGetCollegeDetails", id],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${import.meta.env.VITE_ADMIN_API}/college-view/${id}`
+      );
+      return res.data;
+    },
+    enabled: !!id
+  });
+};

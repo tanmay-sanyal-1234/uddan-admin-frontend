@@ -1,7 +1,7 @@
-import { useQuery,useMutation ,useQueryClient} from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-export const useGetInQueryListAdmin = ({page, limit}) => {
+export const useGetInQueryListAdmin = ({ page, limit }) => {
   return useQuery({
     queryKey: ["useGetInQueryListAdmin", page, limit],
     queryFn: async () => {
@@ -10,9 +10,9 @@ export const useGetInQueryListAdmin = ({page, limit}) => {
       );
       return res.data;
     }
-  }); 
-}; 
-export const useGetContactUsListAdmin = ({page, limit}) => {
+  });
+};
+export const useGetContactUsListAdmin = ({ page, limit }) => {
   return useQuery({
     queryKey: ["useGetContactUsListAdmin", page, limit],
     queryFn: async () => {
@@ -21,9 +21,9 @@ export const useGetContactUsListAdmin = ({page, limit}) => {
       );
       return res.data;
     }
-  }); 
-}; 
-export const useGetNewLetterListAdmin = ({page, limit}) => {
+  });
+};
+export const useGetNewLetterListAdmin = ({ page, limit }) => {
   return useQuery({
     queryKey: ["useGetNewLetterListAdmin", page, limit],
     queryFn: async () => {
@@ -32,5 +32,38 @@ export const useGetNewLetterListAdmin = ({page, limit}) => {
       );
       return res.data;
     }
-  }); 
-}; 
+  });
+};
+
+export const useNewsletterDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useNewsletterDelete"],
+    mutationFn: async (id) => {
+      const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/remove-newsletter/${id}`);
+      return res;
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["useGetNewLetterListAdmin"],
+      });
+    },
+  });
+}
+
+export const useContactUsDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useContactUsDelete"],
+    mutationFn: async (id) => {
+      const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/remove-contactus/${id}`);
+      return res;
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["useGetContactUsListAdmin"],
+      });
+    },
+  });
+}
+

@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Form ,Button} from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import Select from 'react-select';
 import { useGetCityState, useGetStreamAndCourse, useAddCollegeCourse } from "@/hooks/collegeHook";
-import {  z } from "zod";
+import { z } from "zod";
 import { toast } from 'react-toastify';
 import FullPageLoader from "@/components/FullPageLoader";
 function AddCollegeCourse() {
@@ -11,26 +11,28 @@ function AddCollegeCourse() {
     console.log(collegeId)
     const MAX_LOGO_SIZE = 2 * 1024 * 1024; // 2MB
     const MAX_BROCHURE_SIZE = 5 * 1024 * 1024; // 5MB
-    const [loading , setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const emptyRow = {
         stream: null,
         course: null,
+        extra_text: "",
         fees: "",
         eligibility: "",
     };
     const [rows, setRows] = useState([emptyRow]);
     const [anyErrors, setAnyErrors] = useState(false);
     const courseRowSchema = z.object({
-  streamId: z.string().min(1, "Stream is required"),
-  courseId: z.string().min(1, "Course is required"),
-  fees: z.number({ invalid_type_error: "Fees must be a number" }).positive("Fees must be greater than 0"),
-  eligibility: z.string().min(1, "Eligibility is required"),
-});
+        streamId: z.string().min(1, "Stream is required"),
+        courseId: z.string().min(1, "Course is required"),
+        extra_text: z.string().optional(),
+        fees: z.number({ invalid_type_error: "Fees must be a number" }).positive("Fees must be greater than 0"),
+        eligibility: z.string().min(1, "Eligibility is required"),
+    });
 
-const courseArraySchema = z
-  .array(courseRowSchema)
-  .min(1, "At least one course is required");
+    const courseArraySchema = z
+        .array(courseRowSchema)
+        .min(1, "At least one course is required");
     const { data: streamAndCourseData, isFetching: isStreamAndCourseFetching } = useGetStreamAndCourse();
     const { mutateAsync: useAddCollegeCourseAdd, isPending } = useAddCollegeCourse(collegeId);
 
@@ -46,7 +48,7 @@ const courseArraySchema = z
     }, [isStreamAndCourseFetching, streamAndCourseData])
     const courseOption = useCallback((id) => {
         console.log("Calculating course options for stream ID:", id);
-        if(id === null) return [];
+        if (id === null) return [];
         const stream = streamAndCourseData.find(s => s._id === id?.value);
         if (stream) {
             return stream.courses.map(course => ({ value: course._id, label: course.name }));
@@ -64,47 +66,48 @@ const courseArraySchema = z
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(rows,"row");
+        console.log(rows, "row");
         const payload = rows.map((row) => ({
-    streamId: row.stream?.value || "",
-    courseId: row.course?.value || "",
-    fees: parseFloat(row?.fees || 0),
-    eligibility: row?.eligibility,
-  }));
+            streamId: row.stream?.value || "",
+            courseId: row.course?.value || "",
+            extra_text: row?.extra_text || "",
+            fees: parseFloat(row?.fees || 0),
+            eligibility: row?.eligibility,
+        }));
 
-  const parsed = courseArraySchema.safeParse(payload);
-  console.log(parsed.error)
-  console.log("FINAL PAYLOAD 👉", payload);
-  setAnyErrors(false);
-  if (!parsed.success ) {
-    setAnyErrors(true);
-    return;
-  }
+        const parsed = courseArraySchema.safeParse(payload);
+        console.log(parsed.error)
+        console.log("FINAL PAYLOAD 👉", payload);
+        setAnyErrors(false);
+        if (!parsed.success) {
+            setAnyErrors(true);
+            return;
+        }
 
-  if(!anyErrors){
-    setLoading(true);
-  await useAddCollegeCourseAdd((payload), {
+        if (!anyErrors) {
+            setLoading(true);
+            await useAddCollegeCourseAdd((payload), {
 
-        onSuccess: (data) => {
-            console.log(data, "success")
-            setLoading(false);
-             toast.success("College courses added successfully!. You can now add tabs for this college.");
-             navigate("/college/add-college-tab/" + collegeId);
-            },
-            onError: (error) => {
-                setLoading(false);
-                 toast.error("Failed to add college courses. Please try again.");
-                console.log(error, "error")
-            }
-        })
+                onSuccess: (data) => {
+                    console.log(data, "success")
+                    setLoading(false);
+                    toast.success("College courses added successfully!. You can now add college details for this college.");
+                    navigate("/college/editorial/" + collegeId);
+                },
+                onError: (error) => {
+                    setLoading(false);
+                    toast.error("Failed to add college courses. Please try again.");
+                    console.log(error, "error")
+                }
+            })
 
 
-    }else{
-        toast.error("Please fix validation errors before submitting.");
-    }
+        } else {
+            toast.error("Please fix validation errors before submitting.");
+        }
 
     };
-    
+
 
 
 
@@ -151,7 +154,7 @@ const courseArraySchema = z
                         <div key={index} className="border p-3 mb-3 rounded">
                             <div className="row g-3 align-items-end">
 
-                                <div className="col-md-3">
+                                <div className="col-md-2">
                                     <Form.Label>Stream <span className='text-danger'>*</span></Form.Label>
                                     <Select
                                         value={row.stream}
@@ -163,7 +166,7 @@ const courseArraySchema = z
                                     {errors[index]?.streamId && (<small className="text-danger">{errors[index].streamId}</small>)}
                                 </div>
 
-                                <div className="col-md-3">
+                                <div className="col-md-2">
                                     <Form.Label>Course <span className='text-danger'>*</span></Form.Label>
                                     <Select
                                         value={row.course}
@@ -173,6 +176,17 @@ const courseArraySchema = z
                                         isDisabled={!row.stream}
                                     />
                                     {errors[index]?.courseId && (<small className="text-danger">{errors[index].courseId}</small>)}
+                                </div>
+
+                                <div className="col-md-2">
+                                    <Form.Label>Extra Text</Form.Label>
+                                    <Form.Control
+                                        value={row.extra_text}
+                                        onChange={(e) =>
+                                            updateRow(index, "extra_text", e.target.value)
+                                        }
+                                        placeholder="Extra text"
+                                    />
                                 </div>
 
                                 <div className="col-md-2">

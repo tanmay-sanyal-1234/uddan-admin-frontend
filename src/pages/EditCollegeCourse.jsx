@@ -2,11 +2,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Form, Button } from "react-bootstrap";
 import Select from 'react-select';
-import { useGetCityState, useGetStreamAndCourse, useAddCollegeCourse, useGetCollegeCourses ,useCollegeCourseDelete} from "@/hooks/collegeHook";
+import { useGetCityState, useGetStreamAndCourse, useAddCollegeCourse, useGetCollegeCourses, useCollegeCourseDelete } from "@/hooks/collegeHook";
 import { z } from "zod";
 import { toast } from 'react-toastify';
 import FullPageLoader from "@/components/FullPageLoader";
-import {ConfirmDeleteToast} from '@/components/ConfirmDeleteToast'
+import { ConfirmDeleteToast } from '@/components/ConfirmDeleteToast'
 function EditCollegeCourse() {
     const { collegeId } = useParams();
     const MAX_LOGO_SIZE = 2 * 1024 * 1024; // 2MB
@@ -16,15 +16,17 @@ function EditCollegeCourse() {
     const emptyRow = {
         stream: null,
         course: null,
+        extra_text: "",
         fees: "",
         eligibility: "",
     };
     const emptyRowPre = {
         stream: null,
         course: null,
+        extra_text: "",
         fees: "",
         eligibility: "",
-        id:""
+        id: ""
     };
     const [rows, setRows] = useState([emptyRow]);
     const [preRows, setPreRows] = useState([emptyRowPre]);
@@ -32,6 +34,7 @@ function EditCollegeCourse() {
     const courseRowSchema = z.object({
         streamId: z.string().min(1, "Stream is required"),
         courseId: z.string().min(1, "Course is required"),
+        extra_text: z.string().optional(),
         fees: z.number({ invalid_type_error: "Fees must be a number" }).positive("Fees must be greater than 0"),
         eligibility: z.string().min(1, "Eligibility is required"),
     });
@@ -66,37 +69,38 @@ function EditCollegeCourse() {
 
 
     useEffect(() => {
-        if (!isGetCourseFetching && getCourse) {
+        if (!isGetCourseFetching && getCourse && streamAndCourseData) {
             const prefillData = getCourse?.data?.map(item => {
                 const stream = streamAndCourseData.find(s => s._id === item.stream);
                 const course = stream?.courses.find(c => c._id === item.course);
                 return {
                     stream: stream ? { value: stream._id, label: stream.name } : null,
                     course: course ? { value: course._id, label: course.name } : null,
+                    extra_text: item.extra_text || "",
                     fees: item.fees || "",
                     eligibility: item.eligibility || "",
-                    id:item?._id
+                    id: item?._id
                 };
             });
             setPreRows(prefillData.length > 0 ? prefillData : [emptyRow]);
         }
-    }, [getCourse, isGetCourseFetching])
+    }, [getCourse, isGetCourseFetching, streamAndCourseData])
 
 
-    const handelDelete = async(id) => {
+    const handelDelete = async (id) => {
         setLoading(true);
-                await useCollegeCourseDeleteUpdate({id:collegeId,courseIds:[id]}, {
-                    onSuccess: (data) => {
-                        setLoading(false);
-                        console.log(data, "success")
-                        toast.success("College Course deleted successfully");
-                    },
-                    onError: (error) => {
-                        setLoading(false);
-                            toast.error("Failed to delete");
-                        console.log(error, "error")
-                    }
-                })
+        await useCollegeCourseDeleteUpdate({ id: collegeId, courseIds: [id] }, {
+            onSuccess: (data) => {
+                setLoading(false);
+                console.log(data, "success")
+                toast.success("College Course deleted successfully");
+            },
+            onError: (error) => {
+                setLoading(false);
+                toast.error("Failed to delete");
+                console.log(error, "error")
+            }
+        })
     }
 
 
@@ -109,6 +113,7 @@ function EditCollegeCourse() {
         const payload = rows.map((row) => ({
             streamId: row.stream?.value || "",
             courseId: row.course?.value || "",
+            extra_text: row?.extra_text || "",
             fees: parseFloat(row?.fees || 0),
             eligibility: row?.eligibility,
         }));
@@ -164,7 +169,7 @@ function EditCollegeCourse() {
         setRows(rows.filter((_, i) => i !== index));
     };
 
-    const handleRemovePreRow = (index,id) => {
+    const handleRemovePreRow = (index, id) => {
         setPreRows(rows.filter((_, i) => i !== index));
     };
     const updateRow = (index, key, value) => {
@@ -196,7 +201,7 @@ function EditCollegeCourse() {
                         <div key={index} className="border p-3 mb-3 rounded">
                             <div className="row g-3 align-items-end">
 
-                                <div className="col-md-3">
+                                <div className="col-md-2">
                                     <Form.Label>Stream <span className='text-danger'>*</span></Form.Label>
                                     <Select
                                         value={row.stream}
@@ -206,10 +211,10 @@ function EditCollegeCourse() {
                                         placeholder="Select Stream"
                                         isDisabled
                                     />
-                                   
+
                                 </div>
 
-                                <div className="col-md-3">
+                                <div className="col-md-2">
                                     <Form.Label>Course <span className='text-danger'>*</span></Form.Label>
                                     <Select
                                         value={row.course}
@@ -218,7 +223,16 @@ function EditCollegeCourse() {
                                         placeholder="Select Course"
                                         isDisabled
                                     />
-                                    
+
+                                </div>
+
+                                <div className="col-md-2">
+                                    <Form.Label>Extra Text</Form.Label>
+                                    <Form.Control
+                                        value={row.extra_text}
+                                        placeholder="Extra text"
+                                        disabled
+                                    />
                                 </div>
 
                                 <div className="col-md-2">
@@ -231,7 +245,7 @@ function EditCollegeCourse() {
                                         placeholder="12+"
                                         disabled
                                     />
-                                    
+
                                 </div>
 
                                 <div className="col-md-2">
@@ -244,9 +258,9 @@ function EditCollegeCourse() {
                                         placeholder="100000"
                                         disabled
                                     />
-                                   
+
                                 </div>
-                                {console.log(row,"rowrowrow")}
+                                {console.log(row, "rowrowrow")}
                                 <div className="col-md-2 d-flex gap-2">
                                     {preRows.length > 1 && (
                                         <Button
@@ -268,7 +282,7 @@ function EditCollegeCourse() {
                         <div key={index} className="border p-3 mb-3 rounded">
                             <div className="row g-3 align-items-end">
 
-                                <div className="col-md-3">
+                                <div className="col-md-2">
                                     <Form.Label>Stream <span className='text-danger'>*</span></Form.Label>
                                     <Select
                                         value={row.stream}
@@ -280,7 +294,7 @@ function EditCollegeCourse() {
                                     {errors[index]?.streamId && (<small className="text-danger">{errors[index].streamId}</small>)}
                                 </div>
 
-                                <div className="col-md-3">
+                                <div className="col-md-2">
                                     <Form.Label>Course <span className='text-danger'>*</span></Form.Label>
                                     <Select
                                         value={row.course}
@@ -290,6 +304,17 @@ function EditCollegeCourse() {
                                         isDisabled={!row.stream}
                                     />
                                     {errors[index]?.courseId && (<small className="text-danger">{errors[index].courseId}</small>)}
+                                </div>
+
+                                <div className="col-md-2">
+                                    <Form.Label>Extra Text</Form.Label>
+                                    <Form.Control
+                                        value={row.extra_text}
+                                        onChange={(e) =>
+                                            updateRow(index, "extra_text", e.target.value)
+                                        }
+                                        placeholder="Extra text"
+                                    />
                                 </div>
 
                                 <div className="col-md-2">

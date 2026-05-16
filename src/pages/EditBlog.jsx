@@ -17,9 +17,9 @@ function EditBlog() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { data, isLoading,isFetching } = useGetBlogDetails(id);
+  const { data, isLoading, isFetching } = useGetBlogDetails(id);
   const { mutateAsync: updateBlog } = useUpdateBlog(id);
-    const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -39,9 +39,9 @@ function EditBlog() {
   // ✅ Prefill Data
   useEffect(() => {
     if (data && !isFetching) {
-        console.log("object")
+      console.log("object")
       const blog = data.data;
-        console.log(blog)
+      console.log(blog)
       setFormData({
         title: blog?.title || "",
         heading: blog?.heading || "",
@@ -56,7 +56,7 @@ function EditBlog() {
         authorImage: null,
       });
     }
-  }, [data,isFetching]);
+  }, [data, isFetching]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -106,35 +106,35 @@ function EditBlog() {
     order: z.number(),
     blockimage: z.any().optional(),
   })
-  .refine(data => data.type !== "block" || (data.title && data.title.trim() !== ""), {
-    message: "Block title required",
-    path: ["title"]
-  })
-  .refine(data => data.type !== "block" || (data.content && data.content.trim() !== ""), {
-    message: "Block content required",
-    path: ["content"]
-  })
-  .refine(data => data.type !== "image" || data.blockimage, {
-    message: "Block image required",
-    path: ["blockimage"]
-  });
-  
+    .refine(data => data.type !== "block" || (data.title && data.title.trim() !== ""), {
+      message: "Block title required",
+      path: ["title"]
+    })
+    .refine(data => data.type !== "block" || (data.content && data.content.trim() !== ""), {
+      message: "Block content required",
+      path: ["content"]
+    })
+    .refine(data => data.type !== "image" || data.blockimage, {
+      message: "Block image required",
+      path: ["blockimage"]
+    });
+
   const blogSchema = z.object({
     title: z.string().min(3, "Title required"),
     heading: z.string().min(3, "Heading required"),
     content: z.string().min(10, "Content required"),
-  
+
     excerpt: z.string().optional(),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
-  
+
     authorName: z.string().min(2, "Author name required"),
-  
+
     coverImage: z.any().optional(),
     authorImage: z.any().optional(),
-  
+
     tags: z.array(z.string()).min(1, "At least one tag required"),
-  
+
     blocks: z.array(blockSchema).min(1, "At least one block required"),
   });
 
@@ -142,24 +142,24 @@ function EditBlog() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-     const validationData = {
-        ...formData,
-        blocks: formData.blocks.map(b => ({
-          ...b,
-          order: Number(b.order)
-        }))
-      };
-    
-      const result = blogSchema.safeParse(validationData);
-    
-      if (!result.success) {
-    
-        result.error.issues.forEach(err => {
+    const validationData = {
+      ...formData,
+      blocks: formData.blocks.map(b => ({
+        ...b,
+        order: Number(b.order)
+      }))
+    };
+
+    const result = blogSchema.safeParse(validationData);
+
+    if (!result.success) {
+
+      result.error.issues.forEach(err => {
         toast.error(err.message);
-        });
-    
-        return;
-      }
+      });
+
+      return;
+    }
 
     const fd = new FormData();
 
@@ -196,7 +196,7 @@ function EditBlog() {
     try {
       setLoading(true);
 
-      await updateBlog(fd ,
+      await updateBlog(fd,
         {
           onSuccess: () => {
             toast.success("Blog updated successfully");
@@ -213,225 +213,225 @@ function EditBlog() {
   };
 
   const editorConfig = {
-        toolbar: {
-            items: [
-                "heading",
-                "|",
-                "bold",
-                "italic",
-                "underline",
-                "strikethrough",
-                "link",
-                "bulletedList",
-                "numberedList",
-                "|",
-                "outdent",
-                "indent",
-                "|",
-                "blockQuote",
-                "insertTable",
-                "mediaEmbed",
-                "horizontalLine",
-                "|",
-                "alignment",
-                "fontSize",
-                "fontColor",
-                "fontBackgroundColor",
-                "highlight",
-                "|",
-                "codeBlock",
-                "sourceEditing",
-                "|",
-                "undo",
-                "redo"
-            ],
-            shouldNotGroupWhenFull: true,
-        },
+    toolbar: {
+      items: [
+        "heading",
+        "|",
+        "bold",
+        "italic",
+        "underline",
+        "strikethrough",
+        "link",
+        "bulletedList",
+        "numberedList",
+        "|",
+        "outdent",
+        "indent",
+        "|",
+        "blockQuote",
+        "insertTable",
+        "mediaEmbed",
+        "horizontalLine",
+        "|",
+        "alignment",
+        "fontSize",
+        "fontColor",
+        "fontBackgroundColor",
+        "highlight",
+        "|",
+        "codeBlock",
+        "sourceEditing",
+        "|",
+        "undo",
+        "redo"
+      ],
+      shouldNotGroupWhenFull: true,
+    },
 
-        codeBlock: {
-            languages: [
-                { language: "plaintext", label: "Plain text" },
-                { language: "html", label: "HTML" },
-                { language: "css", label: "CSS" },
-                { language: "javascript", label: "JavaScript" },
-                { language: "json", label: "JSON" },
-            ],
-        },
+    codeBlock: {
+      languages: [
+        { language: "plaintext", label: "Plain text" },
+        { language: "html", label: "HTML" },
+        { language: "css", label: "CSS" },
+        { language: "javascript", label: "JavaScript" },
+        { language: "json", label: "JSON" },
+      ],
+    },
 
-        table: {
-            contentToolbar: [
-                "tableColumn",
-                "tableRow",
-                "mergeTableCells",
-                "tableCellProperties",
-                "tableProperties",
-            ],
-        },
+    table: {
+      contentToolbar: [
+        "tableColumn",
+        "tableRow",
+        "mergeTableCells",
+        "tableCellProperties",
+        "tableProperties",
+      ],
+    },
 
-        mediaEmbed: {
-            previewsInData: true,
-        },
-    };
+    mediaEmbed: {
+      previewsInData: true,
+    },
+  };
 
 
   if (isFetching) return <FullPageLoader />;
 
   return (
     <div>
-     <div className="header">
-                <h1>Edit Blog</h1>
-            </div>
-    <div className="content-card">
-      {loading && <FullPageLoader />}
-        {console.log(formData,"fff")}
-      <Form onSubmit={handleSubmit}>
+      <div className="header">
+        <h1>Edit Blog</h1>
+      </div>
+      <div className="content-card">
+        {loading && <FullPageLoader />}
+        {console.log(formData, "fff")}
+        <Form onSubmit={handleSubmit}>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Title <span className="text-danger">*</span></Form.Label>
-                        <Form.Control value={formData.title} name="title" onChange={handleChange} />
-                    </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Title <span className="text-danger">*</span></Form.Label>
+            <Form.Control value={formData.title} name="title" onChange={handleChange} />
+          </Form.Group>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Heading <span className="text-danger">*</span></Form.Label>
-                        <Form.Control value={formData.heading} name="heading" onChange={handleChange} />
-                    </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Card Description <span className="text-danger">*</span></Form.Label>
+            <Form.Control value={formData.heading} name="heading" onChange={handleChange} />
+          </Form.Group>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Content <span className="text-danger">*</span></Form.Label>
-                        <CKEditor
-                            editor={ClassicEditor}
-                            data={formData.content}
-                            config={editorConfig}
-                            height={"500px"}
-                            style={{ width: "100%", height: "500px" }}
-                            onChange={(event, editor) => {
-                                const data = editor.getData();
+          <Form.Group className="mb-3">
+            <Form.Label>Summary <span className="text-danger">*</span></Form.Label>
+            <CKEditor
+              editor={ClassicEditor}
+              data={formData.content}
+              config={editorConfig}
+              height={"500px"}
+              style={{ width: "100%", height: "500px" }}
+              onChange={(event, editor) => {
+                const data = editor.getData();
 
-                                setFormData((prev) => ({ ...prev, content: data }));
+                setFormData((prev) => ({ ...prev, content: data }));
 
-                            }}
-                        />
-                    </Form.Group>
+              }}
+            />
+          </Form.Group>
 
-                    {/* <Form.Group className="mb-3">
+          {/* <Form.Group className="mb-3">
           <Form.Label>Category</Form.Label>
           <Form.Control name="category" onChange={handleChange} />
         </Form.Group> */}
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>SEO Title</Form.Label>
-                        <Form.Control value={formData.seoTitle} name="seoTitle" onChange={handleChange} />
-                    </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Meta Title</Form.Label>
+            <Form.Control value={formData.seoTitle} name="seoTitle" onChange={handleChange} />
+          </Form.Group>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>SEO Description</Form.Label>
-                        <Form.Control as="textarea" rows={3} value={formData.seoDescription} name="seoDescription" onChange={handleChange} />
-                    </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Meta Description</Form.Label>
+            <Form.Control as="textarea" rows={3} value={formData.seoDescription} name="seoDescription" onChange={handleChange} />
+          </Form.Group>
 
-                    {/* TAGS */}
-                    {/* <h5>Tags</h5>
+          {/* TAGS */}
+          {/* <h5>Tags</h5>
                     <TagInput tags={tags} setTags={setTags} />
 
                     <hr /> */}
 
-                    {/* BLOCKS */}
-                    <h5>Blocks <span className="text-danger">*</span></h5>
+          {/* BLOCKS */}
+          <h5>Blocks <span className="text-danger">*</span></h5>
 
-                    {formData.blocks.map((block, i) => (
-                        <Card key={i} className="p-3 mb-3">
+          {formData.blocks.map((block, i) => (
+            <Card key={i} className="p-3 mb-3">
 
-                            <div className="d-flex justify-content-end mb-2">
-                                <button
-                                    type="button"
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() => removeBlock(i)}
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                            <select
-                                name="type"
-                                className="form-control mb-2"
-                                value={block.type}
-                                onChange={(e) =>
-                                    handleBlockChange(i, "type", e.target.value)
-                                }
-                            >
-                                <option value="block">Block</option>
-                                
-                            </select>
-                            <Form.Control
-                                placeholder="Order"
-                                className='mb-2'
-                                type="number"
-                                value={block.order}
-                                onChange={(e) => handleBlockChange(i, "order", e.target.value)}
-                            />
+              <div className="d-flex justify-content-end mb-2">
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm"
+                  onClick={() => removeBlock(i)}
+                >
+                  Remove
+                </button>
+              </div>
+              <select
+                name="type"
+                className="form-control mb-2"
+                value={block.type}
+                onChange={(e) =>
+                  handleBlockChange(i, "type", e.target.value)
+                }
+              >
+                <option value="block">Block</option>
 
-                            {/* ✅ CONDITION */}
-                            {block.type === "block" && (
-                                <>
-                                    <input
-                                        className="form-control mb-2"
-                                        placeholder="Title"
-                                        value={block.title || ""}
-                                        onChange={(e) =>
-                                            handleBlockChange(i, "title", e.target.value)
-                                        }
-                                    />
+              </select>
+              <Form.Control
+                placeholder="Order"
+                className='mb-2'
+                type="number"
+                value={block.order}
+                onChange={(e) => handleBlockChange(i, "order", e.target.value)}
+              />
 
-                                    <CKEditor
-                                        editor={ClassicEditor}
-                                        data={block.content || ""}
-                                        config={editorConfig}
-                                        height={"500px"}
-                                        style={{ width: "100%", height: "500px" }}
-                                        onChange={(event, editor) => {
-                                            const data = editor.getData();
-                                            handleBlockChange(i, "content", data)
+              {/* ✅ CONDITION */}
+              {block.type === "block" && (
+                <>
+                  <input
+                    className="form-control mb-2"
+                    placeholder="Title"
+                    value={block.title || ""}
+                    onChange={(e) =>
+                      handleBlockChange(i, "title", e.target.value)
+                    }
+                  />
 
-                                        }}
-                                    />
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={block.content || ""}
+                    config={editorConfig}
+                    height={"500px"}
+                    style={{ width: "100%", height: "500px" }}
+                    onChange={(event, editor) => {
+                      const data = editor.getData();
+                      handleBlockChange(i, "content", data)
+
+                    }}
+                  />
 
 
-                                </>
-                            )}
+                </>
+              )}
 
-                            {block.type === "image" && (
-                                <input
-                                    type="file"
-                                    className="form-control"
-                                    onChange={(e) =>
-                                        handleBlockChange(i, "blockimage", e.target.files[0])
-                                    }
-                                />
-                            )}
+              {block.type === "image" && (
+                <input
+                  type="file"
+                  className="form-control"
+                  onChange={(e) =>
+                    handleBlockChange(i, "blockimage", e.target.files[0])
+                  }
+                />
+              )}
 
-                        </Card>
-                    ))}
+            </Card>
+          ))}
 
-                    <Button variant="info" onClick={addBlock}>Add Block</Button>
+          <Button variant="info" onClick={addBlock}>Add Block</Button>
 
-                    <hr />
-                    <Form.Group className="mb-3">
-                        <Form.Label>Author Name <span className="text-danger">*</span></Form.Label>
-                        <Form.Control value={formData.authorName} name="authorName" onChange={handleChange} />
-                    </Form.Group>
-                    {/* FILES */}
-                    <Form.Group className="mb-3">
-                        <Form.Label>Author Image</Form.Label>
-                        <Form.Control type="file" name="authorImage" onChange={handleFile} />
-                    </Form.Group>
+          <hr />
+          <Form.Group className="mb-3">
+            <Form.Label>Author Name <span className="text-danger">*</span></Form.Label>
+            <Form.Control value={formData.authorName} name="authorName" onChange={handleChange} />
+          </Form.Group>
+          {/* FILES */}
+          <Form.Group className="mb-3">
+            <Form.Label>Author Image</Form.Label>
+            <Form.Control type="file" name="authorImage" onChange={handleFile} />
+          </Form.Group>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Cover Image</Form.Label>
-                        <Form.Control type="file" name="coverImage" onChange={handleFile} />
-                    </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Cover Image</Form.Label>
+            <Form.Control type="file" name="coverImage" onChange={handleFile} />
+          </Form.Group>
 
-                    <Button type="submit">Update</Button>
+          <Button type="submit">Update</Button>
 
-                </Form>
-                </div>
+        </Form>
+      </div>
     </div>
   );
 }

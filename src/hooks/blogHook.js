@@ -207,4 +207,37 @@ export const useGetFaqListAdmin = ({ page, limit }) => {
       return res.data;
     }
   });
-}; 
+};
+
+export const useTestimonialDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useTestimonialDelete"],
+    mutationFn: async (id) => {
+      const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/remove-testimonial/${id}`);
+      return res;
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["useGetTestimonialListAdminList"],
+      });
+    },
+  });
+}
+
+export const useFaqDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["useFaqDelete"],
+    mutationFn: async (id) => {
+      const { data: res } = await axios.delete(`${import.meta.env.VITE_ADMIN_API}/remove-faq/${id}`);
+      return res;
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["useGetFaqListAdminList"],
+      });
+    },
+  });
+}
+
