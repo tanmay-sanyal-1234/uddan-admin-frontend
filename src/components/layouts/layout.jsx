@@ -103,6 +103,14 @@ function Layout({ onLogout }) {
                  Testimonials
               </Link>
             </li>
+            <li>
+              <Link to="/advertisments" className={isActive('/advertisments')}>
+              <span className="icon">
+                <i className="fa fa-picture-o"></i>
+                </span>
+                 Advertise Banner
+              </Link>
+            </li>
             {/* <li>
               <Link to="/profile" className={isActive('/profile')}>
                 <span className="icon">👤</span>

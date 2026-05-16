@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import FullPageLoader from "@/components/FullPageLoader";
-import { useGetContactUsListAdmin } from "@/hooks/inqueryHook";
+import { useGetContactUsListAdmin, useContactUsDelete } from "@/hooks/inqueryHook";
 import momemnt from "moment";
 import { apiImageWrapper } from '@/utils/helpers';
 import {ConfirmDeleteToast} from '../components/ConfirmDeleteToast'
@@ -15,6 +15,7 @@ function ContactUsList() {
     const [totalPages, setTotalPages] = useState(0);
     const [totalData, setTotalData] = useState(0);
     const { data: cList, isFetching, refetch } = useGetContactUsListAdmin({ page, limit });
+    const { mutateAsync: contactUsDeleteUpdate } = useContactUsDelete();
 
     const clList = useMemo(() => {
         if (!isFetching && cList) {
@@ -87,27 +88,27 @@ function ContactUsList() {
             name: 'createdAt',
             selector: row => momemnt(row.createdAt).format("DD-MM-YYYY"),
         },
-        // {
-        //     name: "Action",
-        //     cell: (row) => (
-        //         <div className="action-wrapper">
-        //             <button className="action-btn">⋮</button>
-        //             <div className="action-menu">
-        //                 <div
-        //                     className="action-item delete"
-        //                     onClick={() =>
-        //                         ConfirmDeleteToast(() => handleDelete(row.id))
-        //                     }
-        //                 >
-        //                    <i className="fa fa-trash"></i> Delete
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     ),
-        //     ignoreRowClick: true,
-        //     allowOverflow: true,
-        //     button: true,
-        // }
+        {
+            name: "Action",
+            cell: (row) => (
+                <div className="action-wrapper">
+                    <button className="action-btn">⋮</button>
+                    <div className="action-menu">
+                        <div
+                            className="action-item delete"
+                            onClick={() =>
+                                ConfirmDeleteToast(() => handleDelete(row.id))
+                            }
+                        >
+                           <i className="fa fa-trash"></i> Delete
+                        </div>
+                    </div>
+                </div>
+            ),
+            ignoreRowClick: true,
+            allowOverflow: true,
+            button: true,
+        }
     ];
     const handleEdit = (user) => {
         navigate(`/users/edit/${user.id}`);
@@ -115,16 +116,14 @@ function ContactUsList() {
 
     const handleDelete = async(id) => {
         setLoading(true);
-        await useLeadDeleteUpdate(id, {
+        await contactUsDeleteUpdate(id, {
             onSuccess: (data) => {
                 setLoading(false);
-                console.log(data, "success")
-                toast.success("Lead deleted successfully");
+                toast.success("Contact entry deleted successfully");
             },
             onError: (error) => {
                 setLoading(false);
-                    toast.error("Failed to delete");
-                console.log(error, "error")
+                toast.error("Failed to delete");
             }
         })
     };

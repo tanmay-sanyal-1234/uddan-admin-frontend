@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import FullPageLoader from "@/components/FullPageLoader";
-import { useGetCollegeListAdmin ,useCollegeDelete} from "@/hooks/collegeHook";
+import { useGetCollegeListAdmin, useCollegeDelete } from "@/hooks/collegeHook";
 import momemnt from "moment";
 import { apiImageWrapper } from '@/utils/helpers';
-import {ConfirmDeleteToast} from '../components/ConfirmDeleteToast'
+import { ConfirmDeleteToast } from '../components/ConfirmDeleteToast'
 import { toast } from 'react-toastify';
 function Colleges() {
     const navigate = useNavigate();
@@ -87,19 +87,25 @@ function Colleges() {
                             className="action-item"
                             onClick={() => navigate(`/college-info-edit/${row.id}`)}
                         >
-                           <i className="fa fa-edit"></i> Info Edit
+                            <i className="fa fa-edit"></i> Info Edit
                         </div>
                         <div
                             className="action-item"
                             onClick={() => navigate(`/college-course-edit/${row.id}`)}
                         >
-                           <i className="fa fa-edit"></i> Course Edit
+                            <i className="fa fa-edit"></i> Course Edit
                         </div>
-                        <div
+                        {/* <div
                             className="action-item"
                             onClick={() => navigate(`/college-tab-edit/${row.id}`)}
                         >
                             <i className="fa fa-edit"></i> Tab Edit
+                        </div> */}
+                        <div
+                            className="action-item"
+                            onClick={() => navigate(`/college/editorial/${row.id}`)}
+                        >
+                            <i className="fa fa-edit"></i> Editorial Edit
                         </div>
                         <div
                             className="action-item delete"
@@ -107,7 +113,7 @@ function Colleges() {
                                 ConfirmDeleteToast(() => handleDelete(row.id))
                             }
                         >
-                           <i className="fa fa-trash"></i> Delete 
+                            <i className="fa fa-trash"></i> Delete
                         </div>
                     </div>
                 </div>
@@ -121,7 +127,7 @@ function Colleges() {
         navigate(`/users/edit/${user.id}`);
     };
 
-    const handleDelete = async(id) => {
+    const handleDelete = async (id) => {
         setLoading(true);
         await useCollegeDeleteUpdate(id, {
             onSuccess: (data) => {
@@ -131,7 +137,7 @@ function Colleges() {
             },
             onError: (error) => {
                 setLoading(false);
-                    toast.error("Failed to delete");
+                toast.error("Failed to delete");
                 console.log(error, "error")
             }
         })

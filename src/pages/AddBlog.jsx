@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Row, Col, Card } from "react-bootstrap";
 import Select from 'react-select';
-import { useAddBlog ,useBlogPublish} from "@/hooks/blogHook";
+import { useAddBlog, useBlogPublish } from "@/hooks/blogHook";
 import { z } from "zod";
 import { toast } from 'react-toastify';
 import FullPageLoader from "@/components/FullPageLoader";
@@ -16,7 +16,7 @@ function AddBlog() {
     const [loading, setLoading] = useState(false);
     const [tags, setTags] = useState([]);
     const { mutateAsync: useAddBlogAdd, isPending } = useAddBlog();
-    const { mutateAsync: useBlogPublishAdd, isPending:isPendingBlogPublish } = useBlogPublish();
+    const { mutateAsync: useBlogPublishAdd, isPending: isPendingBlogPublish } = useBlogPublish();
 
     const [formData, setFormData] = useState({
         title: "",
@@ -29,54 +29,54 @@ function AddBlog() {
         authorName: "",
         tags: [""],
         blocks: [
-            { type: "block", title: "", content: "", order: 1,blockimage:null },
+            { type: "block", title: "", content: "", order: 1, blockimage: null },
         ],
         coverImage: null,
         authorImage: null,
     });
 
     const fileSchema = z
-  .instanceof(File)
-  .refine((file) => file.size <= 5 * 1024 * 1024, "Max file size is 5MB");
+        .instanceof(File)
+        .refine((file) => file.size <= 5 * 1024 * 1024, "Max file size is 5MB");
 
-const blockSchema = z.object({
-  type: z.enum(["block", "image"]),
-  title: z.string().optional(),
-  content: z.string().optional(),
-  order: z.number(),
-  blockimage: z.any().optional(),
-})
-.refine(data => data.type !== "block" || (data.title && data.title.trim() !== ""), {
-  message: "Block title required",
-  path: ["title"]
-})
-.refine(data => data.type !== "block" || (data.content && data.content.trim() !== ""), {
-  message: "Block content required",
-  path: ["content"]
-})
-.refine(data => data.type !== "image" || data.blockimage, {
-  message: "Block image required",
-  path: ["blockimage"]
-});
+    const blockSchema = z.object({
+        type: z.enum(["block", "image"]),
+        title: z.string().optional(),
+        content: z.string().optional(),
+        order: z.number(),
+        blockimage: z.any().optional(),
+    })
+        .refine(data => data.type !== "block" || (data.title && data.title.trim() !== ""), {
+            message: "Block title required",
+            path: ["title"]
+        })
+        .refine(data => data.type !== "block" || (data.content && data.content.trim() !== ""), {
+            message: "Block content required",
+            path: ["content"]
+        })
+        .refine(data => data.type !== "image" || data.blockimage, {
+            message: "Block image required",
+            path: ["blockimage"]
+        });
 
-const blogSchema = z.object({
-  title: z.string().min(3, "Title required"),
-  heading: z.string().min(3, "Heading required"),
-  content: z.string().min(10, "Content required"),
+    const blogSchema = z.object({
+        title: z.string().min(3, "Title required"),
+        heading: z.string().min(3, "Heading required"),
+        content: z.string().min(10, "Content required"),
 
-  excerpt: z.string().optional(),
-  seoTitle: z.string().optional(),
-  seoDescription: z.string().optional(),
+        excerpt: z.string().optional(),
+        seoTitle: z.string().optional(),
+        seoDescription: z.string().optional(),
 
-  authorName: z.string().min(2, "Author name required"),
+        authorName: z.string().min(2, "Author name required"),
 
-  coverImage: z.any().optional(),
-  authorImage: z.any().optional(),
+        coverImage: z.any().optional(),
+        authorImage: z.any().optional(),
 
-  tags: z.array(z.string()).min(1, "At least one tag required"),
+        tags: z.array(z.string()).min(1, "At least one tag required"),
 
-  blocks: z.array(blockSchema).min(1, "At least one block required"),
-});
+        blocks: z.array(blockSchema).min(1, "At least one block required"),
+    });
 
     const handleChange = (e) => {
         setFormData({
@@ -103,25 +103,25 @@ const blogSchema = z.object({
     };
 
     const handleBlockChange = (index, field, value) => {
-  const newBlocks = [...formData.blocks];
+        const newBlocks = [...formData.blocks];
 
-  if (field === "type") {
-    newBlocks[index] = {
-      type: value,
-      title: "",
-      content: "",
-      order: newBlocks[index].order,
-      blockimage: null
+        if (field === "type") {
+            newBlocks[index] = {
+                type: value,
+                title: "",
+                content: "",
+                order: newBlocks[index].order,
+                blockimage: null
+            };
+        } else {
+            newBlocks[index][field] = value;
+        }
+
+        setFormData({
+            ...formData,
+            blocks: newBlocks,
+        });
     };
-  } else {
-    newBlocks[index][field] = value;
-  }
-
-  setFormData({
-    ...formData,
-    blocks: newBlocks,
-  });
-};
 
     const addBlock = () => {
         setFormData({
@@ -140,83 +140,83 @@ const blogSchema = z.object({
         });
     };
 
-const handleSubmit = async(e) => {
-  e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-  const validationData = {
-    ...formData,
-    blocks: formData.blocks.map(b => ({
-      ...b,
-      order: Number(b.order)
-    }))
-  };
+        const validationData = {
+            ...formData,
+            blocks: formData.blocks.map(b => ({
+                ...b,
+                order: Number(b.order)
+            }))
+        };
 
-  const result = blogSchema.safeParse(validationData);
+        const result = blogSchema.safeParse(validationData);
 
-  if (!result.success) {
+        if (!result.success) {
 
-    result.error.issues.forEach(err => {
-    toast.error(err.message);
-    });
+            result.error.issues.forEach(err => {
+                toast.error(err.message);
+            });
 
-    return;
-  }
-
-  // ✅ If valid → create FormData
-  const fd = new FormData();
-
-  fd.append("title", formData.title);
-  fd.append("heading", formData.heading);
-  fd.append("content", formData.content);
-//   fd.append("category", formData.category);
-  fd.append("excerpt", formData.excerpt);
-  fd.append("seoTitle", formData.seoTitle);
-  fd.append("seoDescription", formData.seoDescription);
-  fd.append("author[name]", formData.authorName);
-
-  formData.tags.forEach(tag => {
-    fd.append("tags[]", tag);
-  });
-
-  formData.blocks.forEach((block, i) => {
-    fd.append(`blocks[${i}][type]`, block.type);
-    fd.append(`blocks[${i}][title]`, block.title);
-    fd.append(`blocks[${i}][content]`, block.content);
-    fd.append(`blocks[${i}][order]`, block.order);
-
-    if (block.blockimage) {
-      fd.append(`blocks[${i}][blockimage]`, block.blockimage);
-    }
-  });
-
-  if (formData.coverImage) fd.append("coverImage", formData.coverImage);
-  if (formData.authorImage) fd.append("authorImage", formData.authorImage);
-
-  setLoading(true);
-    await useAddBlogAdd(fd, {
-
-        onSuccess: async(data) => {
-            console.log(data, "success")
-            if(data.success){
-                await useBlogPublishAdd({
-                    id:data?.data?._id
-                });
-                setLoading(false);
-                toast.success("Blog Added successfully");
-
-            }
-        },
-        onError: (error) => {
-            setLoading(false);
-            toast.error("Failed to add. Please try again.");
-            console.log(error, "error")
+            return;
         }
-    })
+
+        // ✅ If valid → create FormData
+        const fd = new FormData();
+
+        fd.append("title", formData.title);
+        fd.append("heading", formData.heading);
+        fd.append("content", formData.content);
+        //   fd.append("category", formData.category);
+        fd.append("excerpt", formData.excerpt);
+        fd.append("seoTitle", formData.seoTitle);
+        fd.append("seoDescription", formData.seoDescription);
+        fd.append("author[name]", formData.authorName);
+
+        formData.tags.forEach(tag => {
+            fd.append("tags[]", tag);
+        });
+
+        formData.blocks.forEach((block, i) => {
+            fd.append(`blocks[${i}][type]`, block.type);
+            fd.append(`blocks[${i}][title]`, block.title);
+            fd.append(`blocks[${i}][content]`, block.content);
+            fd.append(`blocks[${i}][order]`, block.order);
+
+            if (block.blockimage) {
+                fd.append(`blocks[${i}][blockimage]`, block.blockimage);
+            }
+        });
+
+        if (formData.coverImage) fd.append("coverImage", formData.coverImage);
+        if (formData.authorImage) fd.append("authorImage", formData.authorImage);
+
+        setLoading(true);
+        await useAddBlogAdd(fd, {
+
+            onSuccess: async (data) => {
+                console.log(data, "success")
+                if (data.success) {
+                    await useBlogPublishAdd({
+                        id: data?.data?._id
+                    });
+                    setLoading(false);
+                    toast.success("Blog Added successfully");
+
+                }
+            },
+            onError: (error) => {
+                setLoading(false);
+                toast.error("Failed to add. Please try again.");
+                console.log(error, "error")
+            }
+        })
 
 
 
-  // API CALL
-};
+        // API CALL
+    };
 
     const removeBlock = (index) => {
 
@@ -314,12 +314,12 @@ const handleSubmit = async(e) => {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Heading <span className="text-danger">*</span></Form.Label>
+                        <Form.Label>Card Description <span className="text-danger">*</span></Form.Label>
                         <Form.Control value={formData.heading} name="heading" onChange={handleChange} />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Content <span className="text-danger">*</span></Form.Label>
+                        <Form.Label>Summary <span className="text-danger">*</span></Form.Label>
                         <CKEditor
                             editor={ClassicEditor}
                             data={formData.content}
@@ -344,12 +344,12 @@ const handleSubmit = async(e) => {
         </Form.Group> */}
 
                     <Form.Group className="mb-3">
-                        <Form.Label>SEO Title</Form.Label>
+                        <Form.Label>Meta Title</Form.Label>
                         <Form.Control value={formData.seoTitle} name="seoTitle" onChange={handleChange} />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>SEO Description</Form.Label>
+                        <Form.Label>Meta Description</Form.Label>
                         <Form.Control as="textarea" rows={3} value={formData.seoDescription} name="seoDescription" onChange={handleChange} />
                     </Form.Group>
 
@@ -383,7 +383,7 @@ const handleSubmit = async(e) => {
                                 }
                             >
                                 <option value="block">Block</option>
-                                
+
                             </select>
                             <Form.Control
                                 placeholder="Order"
