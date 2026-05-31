@@ -18,14 +18,14 @@ function EditCollegeCourse() {
         course: null,
         extra_text: "",
         fees: "",
-        eligibility: "",
+        // eligibility: "",
     };
     const emptyRowPre = {
         stream: null,
         course: null,
         extra_text: "",
         fees: "",
-        eligibility: "",
+        // eligibility: "",
         id: ""
     };
     const [rows, setRows] = useState([emptyRow]);
@@ -36,7 +36,7 @@ function EditCollegeCourse() {
         courseId: z.string().min(1, "Course is required"),
         extra_text: z.string().optional(),
         fees: z.number({ invalid_type_error: "Fees must be a number" }).positive("Fees must be greater than 0"),
-        eligibility: z.string().min(1, "Eligibility is required"),
+        // eligibility: z.string().min(1, "Eligibility is required"),
     });
 
     const courseArraySchema = z
@@ -78,7 +78,7 @@ function EditCollegeCourse() {
                     course: course ? { value: course._id, label: course.name } : null,
                     extra_text: item.extra_text || "",
                     fees: item.fees || "",
-                    eligibility: item.eligibility || "",
+                    // eligibility: item.eligibility || "",
                     id: item?._id
                 };
             });
@@ -115,7 +115,7 @@ function EditCollegeCourse() {
             courseId: row.course?.value || "",
             extra_text: row?.extra_text || "",
             fees: parseFloat(row?.fees || 0),
-            eligibility: row?.eligibility,
+            // eligibility: row?.eligibility,
         }));
 
         const parsed = courseArraySchema.safeParse(payload);
@@ -235,7 +235,7 @@ function EditCollegeCourse() {
                                     />
                                 </div>
 
-                                <div className="col-md-2">
+                                {/* <div className="col-md-2">
                                     <Form.Label>Eligibility <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         value={row.eligibility}
@@ -246,7 +246,7 @@ function EditCollegeCourse() {
                                         disabled
                                     />
 
-                                </div>
+                                </div> */}
 
                                 <div className="col-md-2">
                                     <Form.Label>Fees <span className='text-danger'>*</span></Form.Label>
@@ -317,7 +317,7 @@ function EditCollegeCourse() {
                                     />
                                 </div>
 
-                                <div className="col-md-2">
+                                {/* <div className="col-md-2">
                                     <Form.Label>Eligibility <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         value={row.eligibility}
@@ -327,7 +327,7 @@ function EditCollegeCourse() {
                                         placeholder="12+"
                                     />
                                     {errors[index]?.eligibility && (<small className="text-danger">{errors[index].eligibility}</small>)}
-                                </div>
+                                </div> */}
 
                                 <div className="col-md-2">
                                     <Form.Label>Fees <span className='text-danger'>*</span></Form.Label>

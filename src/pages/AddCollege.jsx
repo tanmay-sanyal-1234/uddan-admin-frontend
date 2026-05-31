@@ -3,16 +3,45 @@ import { useNavigate } from 'react-router-dom';
 import { Form } from "react-bootstrap";
 import Select from 'react-select';
 import { useGetCityState, useGetStreams, useAddCollegeInfo } from "@/hooks/collegeHook";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { z } from "zod";
 import { toast } from 'react-toastify';
 import FullPageLoader from "@/components/FullPageLoader";
 function AddCollege() {
+    const editorConfig = {
+        toolbar: {
+            items: [
+                "heading", "|", "bold", "italic", "underline", "strikethrough", "link", "bulletedList", "numberedList", "|",
+                "outdent", "indent", "|", "blockQuote", "insertTable", "mediaEmbed", "horizontalLine", "|",
+                "alignment", "fontSize", "fontColor", "fontBackgroundColor", "highlight", "|",
+                "codeBlock", "sourceEditing", "|", "undo", "redo"
+            ],
+            shouldNotGroupWhenFull: true,
+        },
+        codeBlock: {
+            languages: [
+                { language: "plaintext", label: "Plain text" },
+                { language: "html", label: "HTML" },
+                { language: "css", label: "CSS" },
+                { language: "javascript", label: "JavaScript" },
+                { language: "json", label: "JSON" },
+            ],
+        },
+        table: {
+            contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableCellProperties", "tableProperties"],
+        },
+        mediaEmbed: {
+            previewsInData: true,
+        },
+    };
     console.log("rendering add college")
     const MAX_LOGO_SIZE = 2 * 1024 * 1024; // 2MB
     const MAX_BROCHURE_SIZE = 5 * 1024 * 1024; // 5MB
     const navigate = useNavigate();
     const [form, setForm] = useState({
         name: "",
+        fullName: "",
         phone: "",
         email: "",
         website: "",
@@ -26,22 +55,23 @@ function AddCollege() {
         long: "88.4694525",
         logo: null,
         brochure: null,
-        collegeType:null,
+        collegeType: null,
         university: "",
         accreditation: "",
         est: "",
         description: "",
         bottomLine: "",
-        shortLine: ""
+        shortLine: "We don't show colleges. We show reality."
     });
     const { data: cityStateData, isFetching } = useGetCityState();
     const { mutateAsync: useAddCollegeInfoAdd, isPending } = useAddCollegeInfo();
-    const [loading , setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const collegeSchema = z.object({
-        name: z.string().min(3, "College name is required"),
-        phone: z.string().min(10, "Invalid phone number"),
-        email: z.string().min(1, "Email is required"),
-        website: z.string().url("Invalid website").optional().or(z.literal("")),
+        name: z.string().min(3, "College short name is required"),
+        fullName: z.string().min(3, "College full name is required"),
+        // phone: z.string().min(10, "Invalid phone number"),
+        // email: z.string().min(1, "Email is required"),
+        // website: z.string().url("Invalid website").optional().or(z.literal("")),
         addressLine1: z.string().min(3, "Address is required"),
         addressLine2: z.string().optional(),
         collegeType: z
@@ -81,7 +111,7 @@ function AddCollege() {
                 (file) => file.size <= MAX_LOGO_SIZE,
                 "Logo must be less than 2MB"
             ),
-            collegeImage: z
+        collegeImage: z
             .instanceof(File)
             .refine(
                 (file) => ["image/jpeg", "image/png", "image/jpg"].includes(file.type),
@@ -110,12 +140,14 @@ function AddCollege() {
         shortLine: z.string().optional(),
     });
     const collegeType = [
-    {
-        value:"GOVT" , label:"Government"},{
-        value:"S_GOVT" , label:"Semi Government"},{
-        value:"PVT" , label:"Private",
-    }
-];
+        {
+            value: "GOVT", label: "Government"
+        }, {
+            value: "S_GOVT", label: "Semi Government"
+        }, {
+            value: "PVT", label: "Private",
+        }
+    ];
     const handleChange = (e) => {
         setForm({
             ...form,
@@ -187,9 +219,10 @@ function AddCollege() {
         setLoading(true);
         const data = new FormData();
         data.append("name", form.name);
-        data.append("phone", form.phone);
-        data.append("email", form.email);
-        data.append("website", form.website);
+        data.append("fullName", form.fullName);
+        // data.append("phone", form.phone);
+        // data.append("email", form.email);
+        // data.append("website", form.website);
         data.append("collegeType", form.collegeType?.value);
 
         data.append("address[line1]", form.addressLine1);
@@ -230,7 +263,7 @@ function AddCollege() {
             },
             onError: (error) => {
                 setLoading(false);
-                    toast.error("Failed to add college info. Please try again.");
+                toast.error("Failed to add college info. Please try again.");
                 console.log(error, "error")
             }
         })
@@ -276,19 +309,24 @@ function AddCollege() {
                 <Form onSubmit={handleSubmit}>
                     <div className="form-row">
                         <div className="form-group">
-                            <label>College Name <span className='text-danger'>*</span></label>
+                            <label>College Full Name <span className='text-danger'>*</span></label>
+                            <input name="fullName" onChange={handleChange} value={form.fullName} />
+                            {errors.fullName && <small className="text-danger">{errors.fullName}</small>}
+                        </div>
+                        <div className="form-group">
+                            <label>College Short Name <span className='text-danger'>*</span></label>
                             <input name="name" onChange={handleChange} />
                             {errors.name && <small className="text-danger">{errors.name}</small>}
                         </div>
 
-                        <div className="form-group">
+                        {/* <div className="form-group">
                             <label>Phone <span className='text-danger'>*</span></label>
                             <input name="phone" onChange={handleChange} />
                             {errors.phone && <small className="text-danger">{errors.phone}</small>}
-                        </div>
+                        </div> */}
                     </div>
 
-                    <div className="form-row">
+                    {/* <div className="form-row">
                         <div className="form-group">
                             <label>Email <span className='text-danger'>*</span></label>
                             <input name="email" onChange={handleChange} />
@@ -300,7 +338,7 @@ function AddCollege() {
                             <input name="website" onChange={handleChange} />
                             {errors.website && <small className="text-danger">{errors.website}</small>}
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="form-group">
                         <label>Address Line 1 <span className='text-danger'>*</span></label>
@@ -353,7 +391,7 @@ function AddCollege() {
                                 onChange={(selected) =>
                                     setForm({ ...form, collegeType: selected })
                                 }
-                                
+
                                 options={collegeType}
                             />
                             {errors.collegeType && <small className="text-danger">{errors.collegeType}</small>}
@@ -392,17 +430,41 @@ function AddCollege() {
 
                     <div className="form-group">
                         <label>Description</label>
-                        <textarea name="description" className="form-control" onChange={handleChange} rows="3"></textarea>
+                        <CKEditor
+                            editor={ClassicEditor}
+                            data={form.description}
+                            config={editorConfig}
+                            onChange={(event, editor) => {
+                                const data = editor.getData();
+                                setForm(prev => ({ ...prev, description: data }));
+                            }}
+                        />
                     </div>
 
                     <div className="form-row">
-                        <div className="form-group">
+                        {/* <div className="form-group">
                             <label>Short Line</label>
-                            <input name="shortLine" onChange={handleChange} />
-                        </div>
+                            <CKEditor
+                                editor={ClassicEditor}
+                                data={form.shortLine}
+                                config={editorConfig}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setForm(prev => ({ ...prev, shortLine: data }));
+                                }}
+                            />
+                        </div> */}
                         <div className="form-group">
                             <label>Bottom Line</label>
-                            <input name="bottomLine" onChange={handleChange} />
+                            <CKEditor
+                                editor={ClassicEditor}
+                                data={form.bottomLine}
+                                config={editorConfig}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setForm(prev => ({ ...prev, bottomLine: data }));
+                                }}
+                            />
                         </div>
                     </div>
 

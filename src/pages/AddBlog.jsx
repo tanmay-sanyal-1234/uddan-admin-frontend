@@ -33,6 +33,7 @@ function AddBlog() {
         ],
         coverImage: null,
         authorImage: null,
+        readTime: "",
     });
 
     const fileSchema = z
@@ -67,6 +68,7 @@ function AddBlog() {
         excerpt: z.string().optional(),
         seoTitle: z.string().optional(),
         seoDescription: z.string().optional(),
+        readTime: z.string().min(1, "Read time required"),
 
         authorName: z.string().min(2, "Author name required"),
 
@@ -172,6 +174,8 @@ function AddBlog() {
         fd.append("excerpt", formData.excerpt);
         fd.append("seoTitle", formData.seoTitle);
         fd.append("seoDescription", formData.seoDescription);
+        fd.append("readTime", formData.readTime);
+
         fd.append("author[name]", formData.authorName);
 
         formData.tags.forEach(tag => {
@@ -353,11 +357,17 @@ function AddBlog() {
                         <Form.Control as="textarea" rows={3} value={formData.seoDescription} name="seoDescription" onChange={handleChange} />
                     </Form.Group>
 
+                    <Form.Group className="mb-3">
+                        <Form.Label>Read Time <span className="text-danger">*</span></Form.Label>
+                        <Form.Control value={formData.readTime} name="readTime" onChange={handleChange} />
+                    </Form.Group>
+
                     {/* TAGS */}
                     <h5>Tags</h5>
                     <TagInput tags={tags} setTags={setTags} />
 
                     <hr />
+
 
                     {/* BLOCKS */}
                     <h5>Blocks <span className="text-danger">*</span></h5>

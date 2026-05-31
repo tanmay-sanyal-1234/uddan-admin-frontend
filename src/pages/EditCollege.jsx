@@ -10,16 +10,44 @@ import {
     useGetCollegeById,
     useUpdateCollegeInfo,
 } from "@/hooks/collegeHook";
-import {apiImageWrapper} from "@/utils/helpers";
+import { apiImageWrapper } from "@/utils/helpers";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 function EditCollege() {
+    const editorConfig = {
+        toolbar: {
+            items: [
+                "heading", "|", "bold", "italic", "underline", "strikethrough", "link", "bulletedList", "numberedList", "|",
+                "outdent", "indent", "|", "blockQuote", "insertTable", "mediaEmbed", "horizontalLine", "|",
+                "alignment", "fontSize", "fontColor", "fontBackgroundColor", "highlight", "|",
+                "codeBlock", "sourceEditing", "|", "undo", "redo"
+            ],
+            shouldNotGroupWhenFull: true,
+        },
+        codeBlock: {
+            languages: [
+                { language: "plaintext", label: "Plain text" },
+                { language: "html", label: "HTML" },
+                { language: "css", label: "CSS" },
+                { language: "javascript", label: "JavaScript" },
+                { language: "json", label: "JSON" },
+            ],
+        },
+        table: {
+            contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableCellProperties", "tableProperties"],
+        },
+        mediaEmbed: {
+            previewsInData: true,
+        },
+    };
     const { id } = useParams();
     const navigate = useNavigate();
 
     const MAX_LOGO_SIZE = 2 * 1024 * 1024;
     const MAX_BROCHURE_SIZE = 5 * 1024 * 1024;
 
-    const { data: cityStateData ,isFetching:isFetchingCityState} = useGetCityState();
+    const { data: cityStateData, isFetching: isFetchingCityState } = useGetCityState();
     const { data: collegeData, isFetching } = useGetCollegeById(id);
     const { mutateAsync: updateCollege } = useUpdateCollegeInfo(id);
 
@@ -27,6 +55,7 @@ function EditCollege() {
 
     const [form, setForm] = useState({
         name: "",
+        fullName: "",
         phone: "",
         email: "",
         website: "",
@@ -38,13 +67,13 @@ function EditCollege() {
         pincode: "",
         lat: "",
         long: "",
-        collegeType:null,
+        collegeType: null,
         university: "",
         accreditation: "",
         est: "",
         description: "",
         bottomLine: "",
-        shortLine: ""
+        shortLine: "We don't show colleges. We show reality."
     });
 
     const [files, setFiles] = useState({
@@ -60,9 +89,10 @@ function EditCollege() {
     // =========================
     const collegeSchema = z.object({
         name: z.string().min(3),
-        phone: z.string().min(10),
-        email: z.string().email(),
-        website: z.string().optional().or(z.literal("")),
+        fullName: z.string().min(3),
+        // phone: z.string().min(10),
+        // email: z.string().email(),
+        // website: z.string().optional().or(z.literal("")),
         addressLine1: z.string().min(3),
         addressLine2: z.string().optional(),
         state: z.object({ value: z.string(), label: z.string() }),
@@ -72,12 +102,12 @@ function EditCollege() {
         brochure: z.instanceof(File).optional(),
         collegeImage: z.instanceof(File).optional(),
         collegeType: z
-        .object({
-            value: z.string(),
-            label: z.string(),
-        })
-        .nullable()
-        .refine(Boolean, { message: "College type is required" }),
+            .object({
+                value: z.string(),
+                label: z.string(),
+            })
+            .nullable()
+            .refine(Boolean, { message: "College type is required" }),
         university: z.string().optional(),
         accreditation: z.string().optional(),
         est: z.string().optional(),
@@ -85,19 +115,21 @@ function EditCollege() {
         bottomLine: z.string().optional(),
         shortLine: z.string().optional(),
     });
-        const collegeType = [
-    {
-        value:"GOVT" , label:"Government"},{
-        value:"S_GOVT" , label:"Semi Government"},{
-        value:"PVT" , label:"Private",
-    }
-];
+    const collegeType = [
+        {
+            value: "GOVT", label: "Government"
+        }, {
+            value: "S_GOVT", label: "Semi Government"
+        }, {
+            value: "PVT", label: "Private",
+        }
+    ];
 
     // =========================
     // Pre-fill Data
     // =========================
     useEffect(() => {
-        console.log(collegeData,"collegeData")
+        console.log(collegeData, "collegeData")
         if (collegeData && cityStateData && !isFetchingCityState) {
             const stateObj = cityStateData.find(
                 (s) => s._id === collegeData?.data.address.state
@@ -109,6 +141,7 @@ function EditCollege() {
 
             setForm({
                 name: collegeData?.data.name,
+                fullName: collegeData?.data.fullName || "",
                 phone: collegeData?.data.phone,
                 email: collegeData?.data.email,
                 website: collegeData?.data.website || "",
@@ -133,7 +166,7 @@ function EditCollege() {
                 shortLine: collegeData?.data.shortLine || "",
             });
         }
-    }, [collegeData, cityStateData,isFetchingCityState]);
+    }, [collegeData, cityStateData, isFetchingCityState]);
 
     // =========================
     // Options
@@ -198,10 +231,11 @@ function EditCollege() {
 
         const data = new FormData();
         data.append("name", form.name);
-        data.append("phone", form.phone);
-        data.append("email", form.email);
-        data.append("website", form.website);
-         data.append("collegeType", form.collegeType?.value);
+        data.append("fullName", form.fullName);
+        // data.append("phone", form.phone);
+        // data.append("email", form.email);
+        // data.append("website", form.website);
+        data.append("collegeType", form.collegeType?.value);
         data.append("address[line1]", form.addressLine1);
         data.append("address[line2]", form.addressLine2);
         data.append("address[city]", form.city.value);
@@ -235,7 +269,7 @@ function EditCollege() {
         }
     };
 
-        const logoValidation = (file) => {
+    const logoValidation = (file) => {
         const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
         if (!allowedTypes.includes(file.type)) {
             setErrors(prev => ({ ...prev, logo: "Only JPG, PNG, JPEG files are allowed" }));
@@ -255,12 +289,12 @@ function EditCollege() {
     }
 
     const handleChange = (e) => {
-        console.log("ddddd",e)
+        console.log("ddddd", e)
         setForm({
             ...form,
             [e.target.name]: e.target.value
         });
-    }; 
+    };
 
     if (isFetching) return <FullPageLoader />;
 
@@ -275,19 +309,25 @@ function EditCollege() {
                 <Form onSubmit={handleSubmit}>
                     <div className="form-row">
                         <div className="form-group">
-                            <label>College Name <span className='text-danger'>*</span></label>
-                            <input name="name" onChange={handleChange} value={form.name}/>
+                            <label>College Full Name <span className='text-danger'>*</span></label>
+                            <input name="fullName" onChange={handleChange} value={form.fullName} />
+                            {errors.fullName && <small className="text-danger">{errors.fullName}</small>}
+                        </div>
+                        <div className="form-group">
+                            <label>College Short Name <span className='text-danger'>*</span></label>
+                            <input name="name" onChange={handleChange} value={form.name} />
                             {errors.name && <small className="text-danger">{errors.name}</small>}
                         </div>
 
-                        <div className="form-group">
+
+                        {/* <div className="form-group">
                             <label>Phone <span className='text-danger'>*</span></label>
                             <input name="phone" onChange={handleChange} value={form.phone}/>
                             {errors.phone && <small className="text-danger">{errors.phone}</small>}
-                        </div>
+                        </div> */}
                     </div>
 
-                    <div className="form-row">
+                    {/* <div className="form-row">
                         <div className="form-group">
                             <label>Email <span className='text-danger'>*</span></label>
                             <input name="email" onChange={handleChange} value={form.email}/>
@@ -299,17 +339,17 @@ function EditCollege() {
                             <input name="website" onChange={handleChange} value={form.website}/>
                             {errors.website && <small className="text-danger">{errors.website}</small>}
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="form-group">
                         <label>Address Line 1 <span className='text-danger'>*</span></label>
-                        <input name="addressLine1" onChange={handleChange} value={form.addressLine1}/>
+                        <input name="addressLine1" onChange={handleChange} value={form.addressLine1} />
                         {errors.addressLine1 && <small className="text-danger">{errors.addressLine1}</small>}
                     </div>
 
                     <div className="form-group">
                         <label>Address Line 2</label>
-                        <input name="addressLine2" onChange={handleChange} value={form.addressLine2}/>
+                        <input name="addressLine2" onChange={handleChange} value={form.addressLine2} />
                     </div>
 
                     <div className="form-row">
@@ -352,7 +392,7 @@ function EditCollege() {
                                 onChange={(selected) =>
                                     setForm({ ...form, collegeType: selected })
                                 }
-                                
+
                                 options={collegeType}
                             />
                             {errors.collegeType && <small className="text-danger">{errors.collegeType}</small>}
@@ -363,7 +403,7 @@ function EditCollege() {
                     <div className="form-row">
                         <div className="form-group">
                             <label>Pincode <span className='text-danger'>*</span></label>
-                            <input name="pincode" onChange={handleChange}  value={form.pincode}/>
+                            <input name="pincode" onChange={handleChange} value={form.pincode} />
                             {errors.pincode && <small className="text-danger">{errors.pincode}</small>}
                         </div>
 
@@ -390,21 +430,45 @@ function EditCollege() {
 
                     <div className="form-group">
                         <label>Description</label>
-                        <textarea name="description" className="form-control" onChange={handleChange} rows="3" value={form.description}></textarea>
+                        <CKEditor
+                            editor={ClassicEditor}
+                            data={form.description}
+                            config={editorConfig}
+                            onChange={(event, editor) => {
+                                const data = editor.getData();
+                                setForm(prev => ({ ...prev, description: data }));
+                            }}
+                        />
                     </div>
 
                     <div className="form-row">
-                        <div className="form-group">
+                        {/* <div className="form-group">
                             <label>Short Line</label>
-                            <input name="shortLine" onChange={handleChange} value={form.shortLine} />
-                        </div>
+                            <CKEditor
+                                editor={ClassicEditor}
+                                data={form.shortLine}
+                                config={editorConfig}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setForm(prev => ({ ...prev, shortLine: data }));
+                                }}
+                            />
+                        </div> */}
                         <div className="form-group">
                             <label>Bottom Line</label>
-                            <input name="bottomLine" onChange={handleChange} value={form.bottomLine} />
+                            <CKEditor
+                                editor={ClassicEditor}
+                                data={form.bottomLine}
+                                config={editorConfig}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setForm(prev => ({ ...prev, bottomLine: data }));
+                                }}
+                            />
                         </div>
                     </div>
 
-                    
+
                     <div className="form-row">
                         <div className="form-group">
                             {collegeData?.data?.logo && (
@@ -418,7 +482,7 @@ function EditCollege() {
                             {errors.logo && <small className="text-danger">{errors.logo}</small>}
                         </div>
                         <div className="form-group">
-                             {collegeData?.data?.thumbnail && (
+                            {collegeData?.data?.thumbnail && (
                                 <img src={apiImageWrapper(collegeData?.data?.thumbnail)} width={100} alt="" />
                             )}
                             <label>College Image <small className='text-primary'>(Only JPG , PNG , JPEG file allowed)</small></label>
@@ -430,7 +494,7 @@ function EditCollege() {
                         </div>
 
                         <div className="form-group">
-                             {collegeData?.data?.media?.brochureUrl && (
+                            {collegeData?.data?.media?.brochureUrl && (
                                 <a href={collegeData?.data?.media?.brochureUrl} download={true}>Download Brochure</a>
                             )}
                             <label>Brochure <small className='text-primary'>(Only PDF file allowed)</small></label>

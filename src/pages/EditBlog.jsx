@@ -34,6 +34,7 @@ function EditBlog() {
     blocks: [],
     coverImage: null,
     authorImage: null,
+    readTime: "",
   });
 
   // ✅ Prefill Data
@@ -54,6 +55,7 @@ function EditBlog() {
         blocks: blog?.blocks || [],
         coverImage: null,
         authorImage: null,
+        readTime: blog?.readTime || "",
       });
     }
   }, [data, isFetching]);
@@ -127,7 +129,7 @@ function EditBlog() {
     excerpt: z.string().optional(),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
-
+    readTime: z.string().min(1, "Read time required"),
     authorName: z.string().min(2, "Author name required"),
 
     coverImage: z.any().optional(),
@@ -170,7 +172,7 @@ function EditBlog() {
     fd.append("seoTitle", formData.seoTitle);
     fd.append("seoDescription", formData.seoDescription);
     fd.append("author[name]", formData.authorName);
-
+    fd.append("readTime", formData.readTime);
 
     formData.tags.forEach((tag) => {
       fd.append("tags[]", tag);
@@ -326,6 +328,11 @@ function EditBlog() {
           <Form.Group className="mb-3">
             <Form.Label>Meta Description</Form.Label>
             <Form.Control as="textarea" rows={3} value={formData.seoDescription} name="seoDescription" onChange={handleChange} />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Read Time <span className="text-danger">*</span></Form.Label>
+            <Form.Control value={formData.readTime} name="readTime" onChange={handleChange} />
           </Form.Group>
 
           {/* TAGS */}

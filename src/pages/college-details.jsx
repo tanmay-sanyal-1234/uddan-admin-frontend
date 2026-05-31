@@ -753,7 +753,7 @@ const CollegeDetails = () => {
                         }}>Add Process Step</Button>
 
                         <Form.Group className="mt-3">
-                            <Form.Label>Advantage Text</Form.Label>
+                            <Form.Label>Advertisements Text</Form.Label>
                             <div className={!!errors[`admissionReality.advantage`] ? 'is-invalid ck-error' : ''}>
                                 <CKEditor
                                     editor={ClassicEditor}
@@ -951,11 +951,17 @@ const CollegeDetails = () => {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Sentiment</Form.Label>
-                            <Form.Control
-                                value={form.hostelExperience.sentiment}
-                                onChange={(e) => handleChange('hostelExperience', 'sentiment', e.target.value)}
-                                isInvalid={!!errors[`hostelExperience.sentiment`]}
-                            />
+                            <div className={!!errors[`hostelExperience.sentiment`] ? 'is-invalid ck-error' : ''}>
+                                <CKEditor
+                                    editor={ClassicEditor}
+                                    data={form.hostelExperience.sentiment}
+                                    config={editorConfig}
+                                    onChange={(event, editor) => {
+                                        const data = editor.getData();
+                                        handleChange('hostelExperience', 'sentiment', data);
+                                    }}
+                                />
+                            </div>
                             <Form.Control.Feedback type="invalid">{errors[`hostelExperience.sentiment`]}</Form.Control.Feedback>
                         </Form.Group>
                     </Card.Body>
@@ -1012,7 +1018,7 @@ const CollegeDetails = () => {
                                         <Form.Control.Feedback type="invalid">{errors[`studentVoices.${index}.details`]}</Form.Control.Feedback>
                                     </Col>
                                     <Col md={2}>
-                                        <Form.Label>Initials</Form.Label>
+                                        <Form.Label>Short name (eg : AR)</Form.Label>
                                         <Form.Control
                                             value={item.initials}
                                             onChange={(e) => updateItem('studentVoices', index, 'initials', e.target.value)}
